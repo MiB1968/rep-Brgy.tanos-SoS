@@ -27,11 +27,11 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const TYPE_COLOR: Record<string, string> = {
-  evacuation: "text-amber-300 bg-amber-900/30 border-amber-700",
-  calamity: "text-blue-300 bg-blue-900/30 border-blue-700",
-  security: "text-red-300 bg-red-900/30 border-red-700",
-  emergency: "text-primary bg-primary/20 border-primary/50",
-  other: "text-muted-foreground bg-muted border-border",
+  evacuation: "text-[#F59E0B] bg-[#F59E0B]/10 border-[#F59E0B]/30",
+  calamity: "text-[#00AEEF] bg-[#00AEEF]/10 border-[#00AEEF]/30",
+  security: "text-[#FF3B5C] bg-[#FF3B5C]/10 border-[#FF3B5C]/30",
+  emergency: "text-[#00F0FF] bg-[#00F0FF]/10 border-[#00F0FF]/30",
+  other: "text-white/30 bg-white/5 border-white/10",
 };
 
 export default function BroadcastsPage() {
@@ -75,38 +75,41 @@ export default function BroadcastsPage() {
 
   return (
     <Layout>
-      <div className="p-6 space-y-5">
+      <div className="p-4 md:p-8 space-y-6 tactical-grid min-h-screen">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-foreground">Broadcasts</h1>
-            <p className="text-xs text-muted-foreground">System-wide announcements and alerts</p>
+            <h1 className="text-xl font-black italic tracking-tighter uppercase text-white font-display flex items-center gap-2">
+              <Radio className="w-5 h-5 text-[#FF3B5C]" />
+              Broadcasts
+            </h1>
+            <p className="text-[10px] font-mono text-white/30 uppercase tracking-[0.2em] mt-1">System-wide announcements</p>
           </div>
           {isAdmin && (
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
-                <Button data-testid="button-new-broadcast" size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs">
+                <Button data-testid="button-new-broadcast" size="sm" className="bg-[#00F0FF] hover:bg-[#00F0FF]/80 text-[#040B1A] font-black text-[10px] uppercase tracking-widest">
                   <Plus className="w-4 h-4 mr-1" /> New Broadcast
                 </Button>
               </DialogTrigger>
-              <DialogContent className="bg-card border-border">
-                <DialogHeader><DialogTitle>Create Broadcast</DialogTitle></DialogHeader>
+              <DialogContent className="bg-[#040B1A] border-[#00F0FF]/20">
+                <DialogHeader><DialogTitle className="text-white font-display">Create Broadcast</DialogTitle></DialogHeader>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                     <FormField control={form.control} name="type" render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs text-muted-foreground uppercase">Type</FormLabel>
+                        <FormLabel className="text-[10px] text-[#00F0FF] font-mono uppercase tracking-wider">Type</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                           <FormControl>
-                            <SelectTrigger data-testid="select-broadcast-type" className="bg-background border-border">
+                            <SelectTrigger data-testid="select-broadcast-type" className="bg-[#040B1A] border-[#00F0FF]/20 text-white font-mono">
                               <SelectValue placeholder="Select type" />
                             </SelectTrigger>
                           </FormControl>
-                          <SelectContent>
-                            <SelectItem value="evacuation">Evacuation</SelectItem>
-                            <SelectItem value="calamity">Calamity</SelectItem>
-                            <SelectItem value="security">Security</SelectItem>
-                            <SelectItem value="emergency">Emergency</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
+                          <SelectContent className="bg-[#040B1A] border-[#00F0FF]/20">
+                            <SelectItem value="evacuation" className="text-white font-mono">Evacuation</SelectItem>
+                            <SelectItem value="calamity" className="text-white font-mono">Calamity</SelectItem>
+                            <SelectItem value="security" className="text-white font-mono">Security</SelectItem>
+                            <SelectItem value="emergency" className="text-white font-mono">Emergency</SelectItem>
+                            <SelectItem value="other" className="text-white font-mono">Other</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -114,12 +117,12 @@ export default function BroadcastsPage() {
                     )} />
                     <FormField control={form.control} name="message" render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs text-muted-foreground uppercase">Message</FormLabel>
-                        <FormControl><Input data-testid="input-broadcast-message" placeholder="Broadcast message..." className="bg-background border-border" {...field} /></FormControl>
+                        <FormLabel className="text-[10px] text-[#00F0FF] font-mono uppercase tracking-wider">Message</FormLabel>
+                        <FormControl><Input data-testid="input-broadcast-message" placeholder="Broadcast message..." className="bg-[#040B1A] border-[#00F0FF]/20 text-white font-mono" {...field} /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
-                    <Button type="submit" disabled={createBroadcast.isPending} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                    <Button type="submit" disabled={createBroadcast.isPending} className="w-full bg-[#00F0FF] hover:bg-[#00F0FF]/80 text-[#040B1A] font-black">
                       Send Broadcast
                     </Button>
                   </form>
@@ -130,29 +133,29 @@ export default function BroadcastsPage() {
         </div>
 
         {isLoading ? (
-          <div className="space-y-2">{[1,2,3].map(i => <div key={i} className="h-16 bg-card border border-border rounded-lg animate-pulse" />)}</div>
+          <div className="space-y-2">{[1,2,3].map(i => <div key={i} className="h-16 tactical-panel border-white/5 animate-pulse" />)}</div>
         ) : Array.isArray(broadcasts) && broadcasts.length === 0 ? (
-          <div className="bg-card border border-border rounded-lg p-12 text-center">
-            <Radio className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground">No broadcasts yet</p>
+          <div className="tactical-panel border-white/5 p-12 text-center">
+            <Radio className="w-8 h-8 text-white/20 mx-auto mb-3" />
+            <p className="text-sm text-white/30 font-mono">No broadcasts yet</p>
           </div>
         ) : (
           <div className="space-y-3">
             {Array.isArray(broadcasts) && broadcasts.map((b: any) => (
-              <div key={b.id} data-testid={`card-broadcast-${b.id}`} className={cn("bg-card border rounded-lg px-4 py-4", b.isActive ? "border-primary/30" : "border-border opacity-60")}>
+              <div key={b.id} data-testid={`card-broadcast-${b.id}`} className={cn("tactical-panel rounded-[24px] px-4 py-4", b.isActive ? "border-[#00F0FF]/20" : "border-white/5 opacity-60")}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <Radio className={cn("w-3.5 h-3.5", b.isActive ? "text-primary" : "text-muted-foreground")} />
+                      <Radio className={cn("w-3.5 h-3.5", b.isActive ? "text-[#00F0FF]" : "text-white/30")} />
                       {b.type && (
-                        <span className={cn("text-[10px] px-2 py-0.5 rounded border font-medium uppercase tracking-wide", TYPE_COLOR[b.type] ?? "text-muted-foreground bg-muted border-border")}>
+                        <span className={cn("text-[10px] px-2 py-0.5 rounded border font-medium uppercase tracking-wide font-mono", TYPE_COLOR[b.type] ?? "text-white/30 bg-white/5 border-white/10")}>
                           {b.type}
                         </span>
                       )}
-                      {b.isActive && <span className="text-[10px] text-primary font-medium uppercase">ACTIVE</span>}
+                      {b.isActive && <span className="text-[10px] text-[#00F0FF] font-medium uppercase font-mono">ACTIVE</span>}
                     </div>
-                    <p className="text-sm text-foreground">{b.message}</p>
-                    <p className="text-[10px] text-muted-foreground mt-1">{b.adminName} · {new Date(b.timestamp).toLocaleString()}</p>
+                    <p className="text-sm text-white">{b.message}</p>
+                    <p className="text-[10px] text-white/20 mt-1 font-mono">{b.adminName} · {new Date(b.timestamp).toLocaleString()}</p>
                   </div>
                   {isAdmin && (
                     <Button
@@ -160,7 +163,7 @@ export default function BroadcastsPage() {
                       variant="outline"
                       size="sm"
                       onClick={() => toggleActive(b.id, b.isActive)}
-                      className="text-xs border-border text-muted-foreground hover:text-foreground flex-shrink-0"
+                      className="text-[10px] border-[#00F0FF]/20 text-white/30 hover:text-white font-mono flex-shrink-0"
                     >
                       {b.isActive ? "Deactivate" : "Activate"}
                     </Button>

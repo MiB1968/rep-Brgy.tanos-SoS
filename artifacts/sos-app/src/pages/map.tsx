@@ -5,6 +5,7 @@ import { MapContainer, TileLayer, Marker, Popup, Circle } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { cn } from "@/lib/utils";
+import { MapPin, Radio } from "lucide-react";
 
 delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -14,14 +15,14 @@ L.Icon.Default.mergeOptions({
 });
 
 const tanodIcon = L.divIcon({
-  html: `<div style="width:12px;height:12px;background:#22c55e;border:2px solid #fff;border-radius:50%;box-shadow:0 0 8px #22c55e88;"></div>`,
+  html: `<div style="width:12px;height:12px;background:#00F0FF;border:2px solid #fff;border-radius:50%;box-shadow:0 0 12px #00F0FF88;"></div>`,
   className: "",
   iconSize: [12, 12],
   iconAnchor: [6, 6],
 });
 
 const offlineIcon = L.divIcon({
-  html: `<div style="width:10px;height:10px;background:#6b7280;border:2px solid #374151;border-radius:50%;"></div>`,
+  html: `<div style="width:10px;height:10px;background:#374151;border:2px solid #1a1a2e;border-radius:50%;"></div>`,
   className: "",
   iconSize: [10, 10],
   iconAnchor: [5, 5],
@@ -38,11 +39,14 @@ export default function MapPage() {
   return (
     <Layout>
       <div className="h-full flex flex-col">
-        <div className="px-6 py-4 border-b border-border bg-card">
-          <h1 className="text-lg font-bold text-foreground">Live Patrol Map</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
+        <div className="px-6 py-4 border-b border-[#00F0FF]/10 bg-[#040B1A]/90 backdrop-blur-xl">
+          <div className="flex items-center gap-2">
+            <MapPin className="w-5 h-5 text-[#00F0FF]" />
+            <h1 className="text-lg font-black text-white font-display uppercase tracking-wider">Live Patrol Map</h1>
+          </div>
+          <p className="text-[10px] font-mono text-[#00F0FF]/60 uppercase tracking-[0.2em] mt-0.5">
             <span className="inline-flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse inline-block" />
+              <span className="w-2 h-2 rounded-full bg-[#00F0FF] animate-pulse inline-block shadow-[0_0_8px_#00F0FF]" />
               {activePatrols.length} tanods on patrol
             </span>
           </p>
@@ -50,14 +54,14 @@ export default function MapPage() {
 
         <div className="flex-1 relative">
           {isLoading && (
-            <div className="absolute inset-0 bg-background/60 flex items-center justify-center z-10">
-              <p className="text-sm text-muted-foreground animate-pulse">Loading map...</p>
+            <div className="absolute inset-0 bg-[#040B1A]/60 flex items-center justify-center z-10">
+              <p className="text-sm text-[#00F0FF] animate-pulse font-mono">Loading tactical grid...</p>
             </div>
           )}
           <MapContainer
             center={[14.5995, 120.9842]}
             zoom={13}
-            style={{ height: "100%", width: "100%", background: "#0a0f1e" }}
+            style={{ height: "100%", width: "100%", background: "#040B1A" }}
             className="h-full"
           >
             <TileLayer
@@ -73,9 +77,9 @@ export default function MapPage() {
                   icon={p.isActive ? tanodIcon : offlineIcon}
                 >
                   <Popup>
-                    <div style={{ fontFamily: "system-ui", fontSize: 12 }}>
+                    <div style={{ fontFamily: "Rajdhani, monospace", fontSize: 12, background: "#040B1A", color: "#00F0FF", border: "1px solid rgba(0,240,255,0.3)", padding: 8, borderRadius: 8 }}>
                       <strong>{p.tanodName ?? "Tanod"}</strong><br />
-                      Status: {p.status ?? "unknown"}<br />
+                      Status: <span style={{ color: p.isActive ? "#00F0FF" : "#94A3B8" }}>{p.status ?? "unknown"}</span><br />
                       Last ping: {p.lastPing ? new Date(p.lastPing).toLocaleTimeString() : "N/A"}
                     </div>
                   </Popup>
@@ -83,7 +87,7 @@ export default function MapPage() {
                     <Circle
                       center={[p.location.lat, p.location.lng]}
                       radius={200}
-                      pathOptions={{ color: "#22c55e", fillColor: "#22c55e", fillOpacity: 0.06, weight: 1, dashArray: "4 4" }}
+                      pathOptions={{ color: "#00F0FF", fillColor: "#00F0FF", fillOpacity: 0.08, weight: 1, dashArray: "4 4" }}
                     />
                   )}
                 </Marker>
@@ -92,11 +96,11 @@ export default function MapPage() {
           </MapContainer>
         </div>
 
-        <div className="px-6 py-3 border-t border-border bg-card">
-          <div className="flex items-center gap-6 text-xs text-muted-foreground">
-            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-400 inline-block" /> On Patrol</span>
-            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-gray-500 inline-block" /> Offline</span>
-            <span className="ml-auto">Auto-refresh every 10s</span>
+        <div className="px-6 py-3 border-t border-[#00F0FF]/10 bg-[#040B1A]/90">
+          <div className="flex items-center gap-6 text-[10px] font-mono text-white/30 uppercase tracking-wider">
+            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#00F0FF] inline-block shadow-[0_0_6px_#00F0FF]" /> On Patrol</span>
+            <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-[#374151] inline-block" /> Offline</span>
+            <span className="ml-auto flex items-center gap-1"><Radio className="w-3 h-3" /> Auto-refresh every 10s</span>
           </div>
         </div>
       </div>

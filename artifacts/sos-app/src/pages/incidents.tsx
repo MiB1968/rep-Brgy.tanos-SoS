@@ -14,15 +14,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { cn } from "@/lib/utils";
-import { Plus, FileText } from "lucide-react";
+import { Plus, FileText, AlertOctagon } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const STATUS_COLOR: Record<string, string> = {
-  pending: "bg-amber-900/40 text-amber-300 border-amber-700",
-  ongoing: "bg-blue-900/40 text-blue-300 border-blue-700",
-  resolved: "bg-green-900/40 text-green-300 border-green-700",
-  referred: "bg-purple-900/40 text-purple-300 border-purple-700",
+  pending: "bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/30",
+  ongoing: "bg-[#00AEEF]/10 text-[#00AEEF] border-[#00AEEF]/30",
+  resolved: "bg-[#10B981]/10 text-[#10B981] border-[#10B981]/30",
+  referred: "bg-[#A855F7]/10 text-[#A855F7] border-[#A855F7]/30",
 };
 
 const schema = z.object({
@@ -67,54 +67,57 @@ export default function IncidentsPage() {
 
   return (
     <Layout>
-      <div className="p-6 space-y-5">
+      <div className="p-4 md:p-8 space-y-6 tactical-grid min-h-screen">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-bold text-foreground">Incident Reports</h1>
-            <p className="text-xs text-muted-foreground">{Array.isArray(incidents) ? incidents.length : 0} incidents</p>
+            <h1 className="text-xl font-black italic tracking-tighter uppercase text-white font-display flex items-center gap-2">
+              <AlertOctagon className="w-5 h-5 text-[#FF3B5C]" />
+              Incident Reports
+            </h1>
+            <p className="text-[10px] font-mono text-white/30 uppercase tracking-[0.2em] mt-1">{Array.isArray(incidents) ? incidents.length : 0} incidents</p>
           </div>
           {(user?.role === "tanod" || user?.role === "admin" || user?.role === "superadmin") && (
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
-                <Button data-testid="button-new-incident" size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs">
+                <Button data-testid="button-new-incident" size="sm" className="bg-[#00F0FF] hover:bg-[#00F0FF]/80 text-[#040B1A] font-black text-[10px] uppercase tracking-widest">
                   <Plus className="w-4 h-4 mr-1" /> New Incident
                 </Button>
               </DialogTrigger>
-              <DialogContent className="bg-card border-border">
+              <DialogContent className="bg-[#040B1A] border-[#00F0FF]/20">
                 <DialogHeader>
-                  <DialogTitle>Report Incident</DialogTitle>
+                  <DialogTitle className="text-white font-display">Report Incident</DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                     <FormField control={form.control} name="type" render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs text-muted-foreground uppercase">Type</FormLabel>
-                        <FormControl><Input data-testid="input-incident-type" placeholder="e.g. Theft, Fight" className="bg-background border-border" {...field} /></FormControl>
+                        <FormLabel className="text-[10px] text-[#00F0FF] font-mono uppercase tracking-wider">Type</FormLabel>
+                        <FormControl><Input data-testid="input-incident-type" placeholder="e.g. Theft, Fight" className="bg-[#040B1A] border-[#00F0FF]/20 text-white font-mono" {...field} /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
                     <FormField control={form.control} name="location" render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs text-muted-foreground uppercase">Location</FormLabel>
-                        <FormControl><Input data-testid="input-incident-location" placeholder="Street / landmark" className="bg-background border-border" {...field} /></FormControl>
+                        <FormLabel className="text-[10px] text-[#00F0FF] font-mono uppercase tracking-wider">Location</FormLabel>
+                        <FormControl><Input data-testid="input-incident-location" placeholder="Street / landmark" className="bg-[#040B1A] border-[#00F0FF]/20 text-white font-mono" {...field} /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
                     <FormField control={form.control} name="description" render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs text-muted-foreground uppercase">Description</FormLabel>
-                        <FormControl><Input data-testid="input-incident-description" placeholder="Brief incident description" className="bg-background border-border" {...field} /></FormControl>
+                        <FormLabel className="text-[10px] text-[#00F0FF] font-mono uppercase tracking-wider">Description</FormLabel>
+                        <FormControl><Input data-testid="input-incident-description" placeholder="Brief incident description" className="bg-[#040B1A] border-[#00F0FF]/20 text-white font-mono" {...field} /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
                     <FormField control={form.control} name="citizenName" render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs text-muted-foreground uppercase">Citizen Name (optional)</FormLabel>
-                        <FormControl><Input data-testid="input-citizen-name" placeholder="Complainant name" className="bg-background border-border" {...field} /></FormControl>
+                        <FormLabel className="text-[10px] text-white/30 font-mono uppercase tracking-wider">Citizen Name (optional)</FormLabel>
+                        <FormControl><Input data-testid="input-citizen-name" placeholder="Complainant name" className="bg-[#040B1A] border-[#00F0FF]/20 text-white font-mono" {...field} /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
-                    <Button type="submit" disabled={createIncident.isPending} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                    <Button type="submit" disabled={createIncident.isPending} className="w-full bg-[#00F0FF] hover:bg-[#00F0FF]/80 text-[#040B1A] font-black">
                       Submit Report
                     </Button>
                   </form>
@@ -125,25 +128,25 @@ export default function IncidentsPage() {
         </div>
 
         {isLoading ? (
-          <div className="space-y-2">{[1,2,3].map(i => <div key={i} className="h-16 bg-card border border-border rounded-lg animate-pulse" />)}</div>
+          <div className="space-y-2">{[1,2,3].map(i => <div key={i} className="h-16 tactical-panel border-white/5 animate-pulse" />)}</div>
         ) : Array.isArray(incidents) && incidents.length === 0 ? (
-          <div className="bg-card border border-border rounded-lg p-12 text-center">
-            <FileText className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground">No incident reports yet</p>
+          <div className="tactical-panel border-white/5 p-12 text-center">
+            <FileText className="w-8 h-8 text-white/20 mx-auto mb-3" />
+            <p className="text-sm text-white/30 font-mono">No incident reports yet</p>
           </div>
         ) : (
           <div className="space-y-2">
             {Array.isArray(incidents) && incidents.map((inc: any) => (
-              <div key={inc.id} data-testid={`card-incident-${inc.id}`} className="bg-card border border-border rounded-lg px-4 py-3 flex items-start gap-4">
-                <FileText className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+              <div key={inc.id} data-testid={`card-incident-${inc.id}`} className="tactical-panel border-white/5 rounded-[24px] px-4 py-3 flex items-start gap-4 hover:border-[#00F0FF]/20 transition-all">
+                <FileText className="w-4 h-4 text-white/30 mt-0.5 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-foreground">{inc.type}</span>
+                    <span className="text-sm font-medium text-white">{inc.type}</span>
                     <Badge className={cn("text-[10px]", STATUS_COLOR[inc.status])}>{inc.status?.toUpperCase()}</Badge>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">{inc.location} · {inc.tanodName}</p>
-                  {inc.description && <p className="text-xs text-muted-foreground truncate mt-0.5">{inc.description}</p>}
-                  <p className="text-[10px] text-muted-foreground mt-1">{new Date(inc.timestamp).toLocaleString()}</p>
+                  <p className="text-[10px] text-white/30 mt-0.5 font-mono">{inc.location} · {inc.tanodName}</p>
+                  {inc.description && <p className="text-[10px] text-white/30 truncate mt-0.5">{inc.description}</p>}
+                  <p className="text-[10px] text-white/20 mt-1 font-mono">{new Date(inc.timestamp).toLocaleString()}</p>
                 </div>
               </div>
             ))}

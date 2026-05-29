@@ -15,14 +15,14 @@ import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, MapPin } from "lucide-react";
+import { Send, MapPin, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const STATUS_COLOR: Record<string, string> = {
-  pending: "bg-amber-900/40 text-amber-300 border-amber-700",
-  responding: "bg-blue-900/40 text-blue-300 border-blue-700",
-  resolved: "bg-green-900/40 text-green-300 border-green-700",
-  cancelled: "bg-gray-700/40 text-gray-400 border-gray-600",
+  pending: "bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/30",
+  responding: "bg-[#00AEEF]/10 text-[#00AEEF] border-[#00AEEF]/30",
+  resolved: "bg-[#10B981]/10 text-[#10B981] border-[#10B981]/30",
+  cancelled: "bg-white/5 text-white/30 border-white/10",
 };
 
 const ALERT_ICONS: Record<string, string> = {
@@ -73,14 +73,14 @@ export default function AlertDetailPage() {
   if (isLoading) return (
     <Layout>
       <div className="p-6">
-        <div className="h-48 bg-card border border-border rounded-lg animate-pulse" />
+        <div className="h-48 tactical-panel border-white/5 animate-pulse" />
       </div>
     </Layout>
   );
 
   if (!alert) return (
     <Layout>
-      <div className="p-6 text-center text-muted-foreground">Alert not found</div>
+      <div className="p-6 text-center text-white/30 font-mono">Alert not found</div>
     </Layout>
   );
 
@@ -92,117 +92,91 @@ export default function AlertDetailPage() {
 
   return (
     <Layout>
-      <div className="p-6 space-y-5 max-w-2xl">
+      <div className="p-4 md:p-8 space-y-6 max-w-2xl">
         <div className="flex items-start gap-4">
           <span className="text-3xl">{ALERT_ICONS[a.type] ?? "🚨"}</span>
           <div className="flex-1">
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-xl font-bold text-foreground">{a.type}</h1>
+              <h1 className="text-xl font-black text-white font-display">{a.type}</h1>
               <Badge className={cn("text-[10px]", STATUS_COLOR[a.status])}>{a.status?.toUpperCase()}</Badge>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Reported by {a.residentName} · {new Date(a.createdAt).toLocaleString()}</p>
+            <p className="text-[10px] text-white/30 mt-1 font-mono">Reported by {a.residentName} · {new Date(a.createdAt).toLocaleString()}</p>
           </div>
         </div>
 
-        <div className="bg-card border border-border rounded-lg p-4 space-y-2">
+        <div className="tactical-panel border-white/5 p-4 space-y-2">
           {a.description && (
             <div>
-              <span className="text-xs text-muted-foreground uppercase tracking-wide">Description</span>
-              <p className="text-sm text-foreground mt-1">{a.description}</p>
+              <span className="text-[10px] text-white/30 uppercase tracking-wider font-mono">Description</span>
+              <p className="text-sm text-white mt-1">{a.description}</p>
             </div>
           )}
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <div className="flex items-center gap-2 text-[10px] text-white/30 font-mono">
             <MapPin className="w-3 h-3" />
             {a.location?.lat?.toFixed(4)}, {a.location?.lng?.toFixed(4)}
           </div>
           {a.respondedByName && (
-            <p className="text-xs text-blue-400">Responding Tanod: {a.respondedByName}</p>
+            <p className="text-[10px] text-[#00F0FF] font-mono">Responding Tanod: {a.respondedByName}</p>
           )}
           {a.resolutionNotes && (
             <div>
-              <span className="text-xs text-muted-foreground uppercase tracking-wide">Resolution</span>
-              <p className="text-sm text-foreground mt-1">{a.resolutionNotes}</p>
+              <span className="text-[10px] text-white/30 uppercase tracking-wider font-mono">Resolution</span>
+              <p className="text-sm text-white mt-1">{a.resolutionNotes}</p>
             </div>
           )}
         </div>
 
         <div className="flex gap-2 flex-wrap">
           {canRespond && (
-            <Button
-              data-testid="button-respond"
-              size="sm"
-              onClick={handleRespond}
-              disabled={respondMutation.isPending}
-              className="bg-blue-600 hover:bg-blue-700 text-white text-xs"
-            >
-              Respond to Alert
+            <Button data-testid="button-respond" size="sm" onClick={handleRespond} disabled={respondMutation.isPending}
+              className="bg-[#00AEEF] hover:bg-[#00AEEF]/80 text-white text-[10px] font-black uppercase tracking-widest">
+              <AlertTriangle className="w-3.5 h-3.5 mr-1" /> Respond to Alert
             </Button>
           )}
           {canResolve && (
-            <Button
-              data-testid="button-resolve"
-              size="sm"
-              variant="outline"
-              onClick={handleResolve}
-              disabled={resolveMutation.isPending}
-              className="border-green-700 text-green-400 hover:bg-green-900/30 text-xs"
-            >
-              Mark Resolved
+            <Button data-testid="button-resolve" size="sm" variant="outline" onClick={handleResolve} disabled={resolveMutation.isPending}
+              className="border-[#10B981]/30 text-[#10B981] hover:bg-[#10B981]/10 text-[10px] font-black uppercase tracking-widest">
+              <CheckCircle className="w-3.5 h-3.5 mr-1" /> Mark Resolved
             </Button>
           )}
           {canCancel && (
-            <Button
-              data-testid="button-cancel"
-              size="sm"
-              variant="outline"
-              onClick={handleCancel}
-              disabled={cancelMutation.isPending}
-              className="border-gray-600 text-gray-400 hover:bg-gray-800 text-xs"
-            >
-              Cancel Alert
+            <Button data-testid="button-cancel" size="sm" variant="outline" onClick={handleCancel} disabled={cancelMutation.isPending}
+              className="border-white/10 text-white/30 hover:bg-white/5 text-[10px] font-black uppercase tracking-widest">
+              <XCircle className="w-3.5 h-3.5 mr-1" /> Cancel Alert
             </Button>
           )}
         </div>
 
-        <div className="bg-card border border-border rounded-lg flex flex-col h-96">
-          <div className="px-4 py-3 border-b border-border">
-            <h2 className="text-sm font-semibold text-foreground">Chat</h2>
+        <div className="tactical-panel border-white/5 flex flex-col h-96">
+          <div className="px-4 py-3 border-b border-white/5 flex items-center gap-2">
+            <Send className="w-4 h-4 text-[#00F0FF]" />
+            <h2 className="text-sm font-semibold text-white">Chat</h2>
           </div>
           <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
             {Array.isArray(messages) && messages.length === 0 ? (
-              <p className="text-xs text-muted-foreground text-center py-8">No messages yet</p>
+              <p className="text-xs text-white/30 text-center py-8 font-mono">No messages yet</p>
             ) : (
               Array.isArray(messages) && messages.map((m: any) => {
                 const isMine = m.senderId === user?.id;
                 return (
                   <div key={m.id} data-testid={`message-${m.id}`} className={cn("flex flex-col gap-0.5", isMine ? "items-end" : "items-start")}>
-                    <span className="text-[10px] text-muted-foreground">{m.senderName} · {m.senderRole}</span>
-                    <div className={cn("px-3 py-2 rounded-lg text-sm max-w-xs", isMine ? "bg-primary/20 text-primary-foreground" : "bg-muted text-foreground")}>
+                    <span className="text-[10px] text-white/30 font-mono">{m.senderName} · {m.senderRole}</span>
+                    <div className={cn("px-3 py-2 rounded-lg text-sm max-w-xs", isMine ? "bg-[#00F0FF]/10 text-[#00F0FF] border border-[#00F0FF]/20" : "bg-white/5 text-white border border-white/10")}>
                       {m.message}
                     </div>
-                    <span className="text-[10px] text-muted-foreground">{new Date(m.timestamp).toLocaleTimeString()}</span>
+                    <span className="text-[10px] text-white/20 font-mono">{new Date(m.timestamp).toLocaleTimeString()}</span>
                   </div>
                 );
               })
             )}
           </div>
           {a.status !== "resolved" && a.status !== "cancelled" && (
-            <div className="px-4 py-3 border-t border-border flex gap-2">
-              <Input
-                data-testid="input-message"
-                value={message}
-                onChange={e => setMessage(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && handleSend()}
-                placeholder="Type a message..."
-                className="bg-background border-border text-sm"
-              />
-              <Button
-                data-testid="button-send-message"
-                size="sm"
-                onClick={handleSend}
-                disabled={sendMsg.isPending || !message.trim()}
-                className="bg-primary hover:bg-primary/90"
-              >
+            <div className="px-4 py-3 border-t border-white/5 flex gap-2">
+              <Input data-testid="input-message" value={message} onChange={e => setMessage(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && handleSend()} placeholder="Type a message..."
+                className="bg-[#040B1A] border-[#00F0FF]/20 text-white font-mono placeholder:text-white/20" />
+              <Button data-testid="button-send-message" size="sm" onClick={handleSend} disabled={sendMsg.isPending || !message.trim()}
+                className="bg-[#00F0FF] hover:bg-[#00F0FF]/80 text-[#040B1A]">
                 <Send className="w-4 h-4" />
               </Button>
             </div>
