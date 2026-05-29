@@ -356,6 +356,12 @@ export async function customFetch<T = unknown>(
     if (token) {
       headers.set("authorization", `Bearer ${token}`);
     }
+  } else if (!headers.has("authorization")) {
+    // Fallback to localStorage if no getter is configured
+    const token = typeof window !== 'undefined' ? localStorage.getItem("brgy_token") : null;
+    if (token) {
+      headers.set("authorization", `Bearer ${token}`);
+    }
   }
 
   const requestInfo = { method, url: resolveUrl(input) };
