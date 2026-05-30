@@ -1,5 +1,3 @@
-import { triggerGlobalLogout } from "../../../../artifacts/sos-app/src/lib/auth";
-
 export type CustomFetchOptions = RequestInit & {
   responseType?: "json" | "text" | "blob" | "auto";
 };
@@ -9,6 +7,17 @@ export type ErrorType<T = unknown> = ApiError<T>;
 export type BodyType<T> = T;
 
 export type AuthTokenGetter = () => Promise<string | null> | string | null;
+
+// ---------------------------------------------------------------------------
+// Unauthorized callback — lets the app layer (auth.tsx) register a logout
+// handler without creating a circular import. Call setOnUnauthorized(logout)
+// once inside AuthProvider's useEffect.
+// ---------------------------------------------------------------------------
+let _onUnauthorized: (() => void) | null = null;
+
+export function setOnUnauthorized(handler: (() => void) | null): void {
+  _onUnauthorized = handler;
+}
 
 const NO_BODY_STATUS = new Set([204, 205, 304]);
 const DEFAULT_JSON_ACCEPT = "application/json, application/problem+json";
@@ -341,7 +350,7 @@ export async function customFetch<T = unknown>(
     // server-side, or tokenVersion bumped). Keeps the UI from being stuck in
     // a broken authenticated state with no error feedback.
     if (response.status === 401) {
-      triggerGlobalLogout();
+      _onUnauthorized?.();
     }
 
     throw new ApiError(response, errorData, requestInfo);
