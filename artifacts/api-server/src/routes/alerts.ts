@@ -13,6 +13,7 @@ const alertShape = (a: typeof alertsTable.$inferSelect) => ({
   status: a.status,
   location: a.location,
   description: a.description ?? null,
+  severityScore: a.severityScore ?? null,
   assignedTo: a.assignedTo ?? null,
   assignedToName: a.assignedToName ?? null,
   respondedBy: a.respondedBy ?? null,
@@ -20,7 +21,9 @@ const alertShape = (a: typeof alertsTable.$inferSelect) => ({
   respondedAt: a.respondedAt?.toISOString() ?? null,
   resolvedAt: a.resolvedAt?.toISOString() ?? null,
   resolutionNotes: a.resolutionNotes ?? null,
+  responderNotes: a.responderNotes ?? null,
   createdAt: a.createdAt?.toISOString() ?? new Date().toISOString(),
+  updatedAt: a.updatedAt?.toISOString() ?? new Date().toISOString(),
 });
 
 const msgShape = (m: typeof alertMessagesTable.$inferSelect) => ({
@@ -105,6 +108,7 @@ router.patch("/alerts/:id", requireAuth, async (req, res): Promise<void> => {
   res.json(alertShape(updated));
 });
 
+// Alias: respond to alert (redirects to patch)
 router.post("/alerts/:id/respond", requireAuth, async (req, res): Promise<void> => {
   const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const [updated] = await db.update(alertsTable).set({
@@ -121,6 +125,7 @@ router.post("/alerts/:id/respond", requireAuth, async (req, res): Promise<void> 
   res.json(alertShape(updated));
 });
 
+// Alias: resolve alert
 router.post("/alerts/:id/resolve", requireAuth, async (req, res): Promise<void> => {
   const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const { resolutionNotes } = req.body;
@@ -137,6 +142,7 @@ router.post("/alerts/:id/resolve", requireAuth, async (req, res): Promise<void> 
   res.json(alertShape(updated));
 });
 
+// Alias: cancel alert
 router.post("/alerts/:id/cancel", requireAuth, async (req, res): Promise<void> => {
   const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
   const [updated] = await db.update(alertsTable).set({

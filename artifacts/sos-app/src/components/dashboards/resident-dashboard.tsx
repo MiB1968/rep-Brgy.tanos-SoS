@@ -46,6 +46,46 @@ const itemVariants = {
   show: { opacity: 1, y: 0 },
 };
 
+function playSirenSound() {
+  try {
+    const ctx = new AudioContext();
+    const now = ctx.currentTime;
+    const duration = 3.0;
+
+    // Create oscillator for siren tone
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    // Siren sweep: low to high and back
+    osc.frequency.setValueAtTime(600, now);
+    osc.frequency.linearRampToValueAtTime(1200, now + 0.5);
+    osc.frequency.linearRampToValueAtTime(600, now + 1.0);
+    osc.frequency.linearRampToValueAtTime(1200, now + 1.5);
+    osc.frequency.linearRampToValueAtTime(600, now + 2.0);
+    osc.frequency.linearRampToValueAtTime(1200, now + 2.5);
+    osc.frequency.linearRampToValueAtTime(600, now + 3.0);
+
+    // Gain envelope for pulsing effect
+    gain.gain.setValueAtTime(0.15, now);
+    for (let i = 0; i < 6; i++) {
+      gain.gain.linearRampToValueAtTime(0.2, now + i * 0.5 + 0.1);
+      gain.gain.linearRampToValueAtTime(0.05, now + i * 0.5 + 0.4);
+    }
+    gain.gain.linearRampToValueAtTime(0, now + duration);
+
+    osc.type = "sawtooth";
+    osc.start(now);
+    osc.stop(now + duration);
+
+    // Auto-close context after sound
+    osc.onended = () => ctx.close();
+  } catch {
+    // AudioContext not available, ignore silently
+  }
+}
+
 export default function ResidentDashboard() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -120,6 +160,7 @@ export default function ResidentDashboard() {
   }
 
   function doCreate(location: { lat: number; lng: number }, type = "OTHER", description = "SOS triggered by resident") {
+    playSirenSound();
     createAlert.mutate(
       { data: { type, location, description } } as any,
       {

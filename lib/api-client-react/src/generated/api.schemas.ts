@@ -89,7 +89,7 @@ export interface UserUpdate {
 }
 
 export interface RejectInput {
-  reason: string;
+  reason?: string;
 }
 
 export interface Location {

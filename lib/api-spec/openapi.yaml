@@ -861,7 +861,6 @@ components:
 
     RejectInput:
       type: object
-      required: [reason]
       properties:
         reason:
           type: string

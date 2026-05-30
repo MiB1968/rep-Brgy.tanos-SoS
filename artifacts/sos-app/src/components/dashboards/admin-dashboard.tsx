@@ -59,7 +59,6 @@ export default function AdminDashboard() {
 
   const s = stats as any;
   const activeAlerts = s?.activeAlerts ?? 0;
-  const pendingAlerts = s?.pendingAlerts ?? 0;
   const isFlashing = activeAlerts > 0;
 
   return (

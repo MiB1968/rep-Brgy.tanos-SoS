@@ -178,7 +178,7 @@ export const RejectUserParams = zod.object({
 })
 
 export const RejectUserBody = zod.object({
-  "reason": zod.string()
+  "reason": zod.string().optional()
 })
 
 export const RejectUserResponse = zod.object({

@@ -79,7 +79,9 @@ router.post("/users/:id/approve", requireAuth, requireRole("admin", "superadmin"
 
 router.post("/users/:id/reject", requireAuth, requireRole("admin", "superadmin"), async (req, res): Promise<void> => {
   const id = Array.isArray(req.params.id) ? req.params.id[0] : req.params.id;
-  const [updated] = await db.update(usersTable).set({ status: "rejected" }).where(eq(usersTable.id, id)).returning();
+  const [updated] = await db.update(usersTable).set({
+    status: "rejected",
+  }).where(eq(usersTable.id, id)).returning();
   if (!updated) {
     res.status(404).json({ error: "User not found" });
     return;
