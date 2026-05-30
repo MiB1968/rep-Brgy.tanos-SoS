@@ -1,0 +1,19 @@
+{
+  "name": "Brgy Tanod S.O.S",
+  "short_name": "Brgy SOS",
+  "description": "Emergency response system for Barangay residents, tanods, and admins.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#040B1A",
+  "theme_color": "#040B1A",
+  "icons": [
+    {
+      "src": "./pwa-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
