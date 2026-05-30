@@ -20,6 +20,7 @@ const incidentShape = (i: typeof incidentsTable.$inferSelect) => ({
   citizenName: i.citizenName ?? null,
   timestamp: i.timestamp?.toISOString() ?? new Date().toISOString(),
   resolvedAt: i.resolvedAt?.toISOString() ?? null,
+  resolutionNotes: i.resolutionNotes ?? null,
 });
 
 router.get("/incidents", requireAuth, async (req, res): Promise<void> => {

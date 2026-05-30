@@ -17,4 +17,6 @@ export interface AlertUpdate {
   resolutionNotes?: string | null;
   /** @nullable */
   responderNotes?: string | null;
+  /** @nullable */
+  severityScore?: number | null;
 }

@@ -29,4 +29,6 @@ export interface Incident {
   timestamp: Date;
   /** @nullable */
   resolvedAt?: Date | null;
+  /** @nullable */
+  resolutionNotes?: string | null;
 }

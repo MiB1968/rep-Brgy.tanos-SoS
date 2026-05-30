@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Layout } from "@/components/layout";
 import {
-  useListBroadcasts,
+  useListBroadcasts, getListBroadcastsQueryKey,
   useCreateBroadcast,
   useUpdateBroadcast,
 } from "@workspace/api-client-react";
@@ -42,7 +42,7 @@ export default function BroadcastsPage() {
 
   const { data: broadcasts = [], isLoading } = useListBroadcasts(
     {},
-    { query: { queryKey: ["broadcasts"] } }
+    { query: { queryKey: getListBroadcastsQueryKey({}) } }
   );
 
   const createBroadcast = useCreateBroadcast();
@@ -59,7 +59,7 @@ export default function BroadcastsPage() {
         toast({ title: "Broadcast sent" });
         setOpen(false);
         form.reset();
-        qc.invalidateQueries({ queryKey: ["broadcasts"] });
+        qc.invalidateQueries({ queryKey: getListBroadcastsQueryKey({}) });
       },
       onError: () => toast({ title: "Failed to send broadcast", variant: "destructive" }),
     });
@@ -67,7 +67,7 @@ export default function BroadcastsPage() {
 
   function toggleActive(id: string, isActive: boolean) {
     updateBroadcast.mutate({ id, data: { isActive: !isActive } } as any, {
-      onSuccess: () => qc.invalidateQueries({ queryKey: ["broadcasts"] }),
+      onSuccess: () => qc.invalidateQueries({ queryKey: getListBroadcastsQueryKey({}) }),
     });
   }
 

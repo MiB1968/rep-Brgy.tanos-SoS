@@ -10,6 +10,7 @@ import {
   useListAlerts,
   useListBroadcasts,
   getListAlertsQueryKey,
+  getListBroadcastsQueryKey,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
@@ -106,7 +107,7 @@ export default function ResidentDashboard() {
 
   const { data: broadcasts = [] } = useListBroadcasts(
     {},
-    { query: { queryKey: ["broadcasts", "active"] } }
+    { query: { queryKey: getListBroadcastsQueryKey({}) } }
   );
 
   const activeAlert = Array.isArray(myAlerts)

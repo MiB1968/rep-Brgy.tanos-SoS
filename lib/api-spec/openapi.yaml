@@ -203,7 +203,6 @@ paths:
           schema:
             type: string
       requestBody:
-        required: true
         content:
           application/json:
             schema:
@@ -896,6 +895,8 @@ components:
           $ref: "#/components/schemas/Location"
         description:
           type: ["string", "null"]
+        severityScore:
+          type: ["integer", "null"]
         assignedTo:
           type: ["string", "null"]
         assignedToName:
@@ -912,7 +913,12 @@ components:
           format: date-time
         resolutionNotes:
           type: ["string", "null"]
+        responderNotes:
+          type: ["string", "null"]
         createdAt:
+          type: string
+          format: date-time
+        updatedAt:
           type: string
           format: date-time
 
@@ -941,6 +947,8 @@ components:
           type: ["string", "null"]
         responderNotes:
           type: ["string", "null"]
+        severityScore:
+          type: ["integer", "null"]
 
     ResolveAlertInput:
       type: object
@@ -1045,10 +1053,12 @@ components:
         resolvedAt:
           type: ["string", "null"]
           format: date-time
+        resolutionNotes:
+          type: ["string", "null"]
 
     IncidentInput:
       type: object
-      required: [type, description, status]
+      required: [type, description]
       properties:
         alertId:
           type: ["string", "null"]

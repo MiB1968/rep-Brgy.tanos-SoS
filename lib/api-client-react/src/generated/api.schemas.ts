@@ -135,6 +135,8 @@ export interface Alert {
   /** @nullable */
   description?: string | null;
   /** @nullable */
+  severityScore?: number | null;
+  /** @nullable */
   assignedTo?: string | null;
   /** @nullable */
   assignedToName?: string | null;
@@ -148,7 +150,10 @@ export interface Alert {
   resolvedAt?: string | null;
   /** @nullable */
   resolutionNotes?: string | null;
+  /** @nullable */
+  responderNotes?: string | null;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export type AlertInputType = typeof AlertInputType[keyof typeof AlertInputType];
@@ -183,6 +188,8 @@ export interface AlertUpdate {
   resolutionNotes?: string | null;
   /** @nullable */
   responderNotes?: string | null;
+  /** @nullable */
+  severityScore?: number | null;
 }
 
 export interface ResolveAlertInput {
@@ -267,13 +274,15 @@ export interface Incident {
   timestamp: string;
   /** @nullable */
   resolvedAt?: string | null;
+  /** @nullable */
+  resolutionNotes?: string | null;
 }
 
 export interface IncidentInput {
   /** @nullable */
   alertId?: string | null;
   type: string;
-  status: string;
+  status?: string;
   /** @nullable */
   location?: string | null;
   gpsLocation?: Location | null;

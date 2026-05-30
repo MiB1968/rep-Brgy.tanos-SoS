@@ -215,6 +215,7 @@ export const ListAlertsResponseItem = zod.object({
   "accuracy": zod.number().nullish()
 }),
   "description": zod.string().nullish(),
+  "severityScore": zod.number().nullish(),
   "assignedTo": zod.string().nullish(),
   "assignedToName": zod.string().nullish(),
   "respondedBy": zod.string().nullish(),
@@ -222,7 +223,9 @@ export const ListAlertsResponseItem = zod.object({
   "respondedAt": zod.coerce.date().nullish(),
   "resolvedAt": zod.coerce.date().nullish(),
   "resolutionNotes": zod.string().nullish(),
-  "createdAt": zod.coerce.date()
+  "responderNotes": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date().optional()
 })
 export const ListAlertsResponse = zod.array(ListAlertsResponseItem)
 
@@ -260,6 +263,7 @@ export const GetAlertResponse = zod.object({
   "accuracy": zod.number().nullish()
 }),
   "description": zod.string().nullish(),
+  "severityScore": zod.number().nullish(),
   "assignedTo": zod.string().nullish(),
   "assignedToName": zod.string().nullish(),
   "respondedBy": zod.string().nullish(),
@@ -267,7 +271,9 @@ export const GetAlertResponse = zod.object({
   "respondedAt": zod.coerce.date().nullish(),
   "resolvedAt": zod.coerce.date().nullish(),
   "resolutionNotes": zod.string().nullish(),
-  "createdAt": zod.coerce.date()
+  "responderNotes": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date().optional()
 })
 
 
@@ -283,7 +289,8 @@ export const UpdateAlertBody = zod.object({
   "assignedTo": zod.string().nullish(),
   "assignedToName": zod.string().nullish(),
   "resolutionNotes": zod.string().nullish(),
-  "responderNotes": zod.string().nullish()
+  "responderNotes": zod.string().nullish(),
+  "severityScore": zod.number().nullish()
 })
 
 export const UpdateAlertResponse = zod.object({
@@ -298,6 +305,7 @@ export const UpdateAlertResponse = zod.object({
   "accuracy": zod.number().nullish()
 }),
   "description": zod.string().nullish(),
+  "severityScore": zod.number().nullish(),
   "assignedTo": zod.string().nullish(),
   "assignedToName": zod.string().nullish(),
   "respondedBy": zod.string().nullish(),
@@ -305,7 +313,9 @@ export const UpdateAlertResponse = zod.object({
   "respondedAt": zod.coerce.date().nullish(),
   "resolvedAt": zod.coerce.date().nullish(),
   "resolutionNotes": zod.string().nullish(),
-  "createdAt": zod.coerce.date()
+  "responderNotes": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date().optional()
 })
 
 
@@ -328,6 +338,7 @@ export const RespondToAlertResponse = zod.object({
   "accuracy": zod.number().nullish()
 }),
   "description": zod.string().nullish(),
+  "severityScore": zod.number().nullish(),
   "assignedTo": zod.string().nullish(),
   "assignedToName": zod.string().nullish(),
   "respondedBy": zod.string().nullish(),
@@ -335,7 +346,9 @@ export const RespondToAlertResponse = zod.object({
   "respondedAt": zod.coerce.date().nullish(),
   "resolvedAt": zod.coerce.date().nullish(),
   "resolutionNotes": zod.string().nullish(),
-  "createdAt": zod.coerce.date()
+  "responderNotes": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date().optional()
 })
 
 
@@ -362,6 +375,7 @@ export const ResolveAlertResponse = zod.object({
   "accuracy": zod.number().nullish()
 }),
   "description": zod.string().nullish(),
+  "severityScore": zod.number().nullish(),
   "assignedTo": zod.string().nullish(),
   "assignedToName": zod.string().nullish(),
   "respondedBy": zod.string().nullish(),
@@ -369,7 +383,9 @@ export const ResolveAlertResponse = zod.object({
   "respondedAt": zod.coerce.date().nullish(),
   "resolvedAt": zod.coerce.date().nullish(),
   "resolutionNotes": zod.string().nullish(),
-  "createdAt": zod.coerce.date()
+  "responderNotes": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date().optional()
 })
 
 
@@ -392,6 +408,7 @@ export const CancelAlertResponse = zod.object({
   "accuracy": zod.number().nullish()
 }),
   "description": zod.string().nullish(),
+  "severityScore": zod.number().nullish(),
   "assignedTo": zod.string().nullish(),
   "assignedToName": zod.string().nullish(),
   "respondedBy": zod.string().nullish(),
@@ -399,7 +416,9 @@ export const CancelAlertResponse = zod.object({
   "respondedAt": zod.coerce.date().nullish(),
   "resolvedAt": zod.coerce.date().nullish(),
   "resolutionNotes": zod.string().nullish(),
-  "createdAt": zod.coerce.date()
+  "responderNotes": zod.string().nullish(),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date().optional()
 })
 
 
@@ -522,7 +541,8 @@ export const ListIncidentsResponseItem = zod.object({
   "actionsTaken": zod.string().nullish(),
   "citizenName": zod.string().nullish(),
   "timestamp": zod.coerce.date(),
-  "resolvedAt": zod.coerce.date().nullish()
+  "resolvedAt": zod.coerce.date().nullish(),
+  "resolutionNotes": zod.string().nullish()
 })
 export const ListIncidentsResponse = zod.array(ListIncidentsResponseItem)
 
@@ -533,7 +553,7 @@ export const ListIncidentsResponse = zod.array(ListIncidentsResponseItem)
 export const CreateIncidentBody = zod.object({
   "alertId": zod.string().nullish(),
   "type": zod.string(),
-  "status": zod.string(),
+  "status": zod.string().optional(),
   "location": zod.string().nullish(),
   "gpsLocation": zod.union([zod.object({
   "lat": zod.number(),
@@ -572,7 +592,8 @@ export const GetIncidentResponse = zod.object({
   "actionsTaken": zod.string().nullish(),
   "citizenName": zod.string().nullish(),
   "timestamp": zod.coerce.date(),
-  "resolvedAt": zod.coerce.date().nullish()
+  "resolvedAt": zod.coerce.date().nullish(),
+  "resolutionNotes": zod.string().nullish()
 })
 
 
@@ -607,7 +628,8 @@ export const UpdateIncidentResponse = zod.object({
   "actionsTaken": zod.string().nullish(),
   "citizenName": zod.string().nullish(),
   "timestamp": zod.coerce.date(),
-  "resolvedAt": zod.coerce.date().nullish()
+  "resolvedAt": zod.coerce.date().nullish(),
+  "resolutionNotes": zod.string().nullish()
 })
 
 

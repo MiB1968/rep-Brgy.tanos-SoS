@@ -682,7 +682,7 @@ export const getRejectUserUrl = (id: string,) => {
  * @summary Reject pending user
  */
 export const rejectUser = async (id: string,
-    rejectInput: RejectInput, options?: RequestInit): Promise<User> => {
+    rejectInput?: RejectInput, options?: RequestInit): Promise<User> => {
 
   return customFetch<User>(getRejectUserUrl(id),
   {
@@ -698,8 +698,8 @@ export const rejectUser = async (id: string,
 
 
 export const getRejectUserMutationOptions = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rejectUser>>, TError,{id: string;data: BodyType<RejectInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof rejectUser>>, TError,{id: string;data: BodyType<RejectInput>}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rejectUser>>, TError,{id: string;data?: BodyType<RejectInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof rejectUser>>, TError,{id: string;data?: BodyType<RejectInput>}, TContext> => {
 
 const mutationKey = ['rejectUser'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -711,7 +711,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof rejectUser>>, {id: string;data: BodyType<RejectInput>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof rejectUser>>, {id: string;data?: BodyType<RejectInput>}> = (props) => {
           const {id,data} = props ?? {};
 
           return  rejectUser(id,data,requestOptions)
@@ -725,18 +725,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type RejectUserMutationResult = NonNullable<Awaited<ReturnType<typeof rejectUser>>>
-    export type RejectUserMutationBody = BodyType<RejectInput>
+    export type RejectUserMutationBody = BodyType<RejectInput> | undefined
     export type RejectUserMutationError = ErrorType<unknown>
 
     /**
  * @summary Reject pending user
  */
 export const useRejectUser = <TError = ErrorType<unknown>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rejectUser>>, TError,{id: string;data: BodyType<RejectInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof rejectUser>>, TError,{id: string;data?: BodyType<RejectInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
  ): UseMutationResult<
         Awaited<ReturnType<typeof rejectUser>>,
         TError,
-        {id: string;data: BodyType<RejectInput>},
+        {id: string;data?: BodyType<RejectInput>},
         TContext
       > => {
       return useMutation(getRejectUserMutationOptions(options));

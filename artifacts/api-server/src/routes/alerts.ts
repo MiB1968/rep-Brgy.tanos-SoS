@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { eq, and, or, inArray } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { db, alertsTable, alertMessagesTable } from "@workspace/db";
 import { requireAuth } from "../middlewares/requireAuth";
 

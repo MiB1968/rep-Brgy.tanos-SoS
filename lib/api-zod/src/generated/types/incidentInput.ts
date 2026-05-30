@@ -11,7 +11,7 @@ export interface IncidentInput {
   /** @nullable */
   alertId?: string | null;
   type: string;
-  status: string;
+  status?: string;
   /** @nullable */
   location?: string | null;
   gpsLocation?: Location | null;

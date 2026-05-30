@@ -21,6 +21,8 @@ export interface Alert {
   /** @nullable */
   description?: string | null;
   /** @nullable */
+  severityScore?: number | null;
+  /** @nullable */
   assignedTo?: string | null;
   /** @nullable */
   assignedToName?: string | null;
@@ -34,5 +36,8 @@ export interface Alert {
   resolvedAt?: Date | null;
   /** @nullable */
   resolutionNotes?: string | null;
+  /** @nullable */
+  responderNotes?: string | null;
   createdAt: Date;
+  updatedAt?: Date;
 }
