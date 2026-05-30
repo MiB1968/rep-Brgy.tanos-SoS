@@ -5,7 +5,7 @@ const TILE_CACHE = `${VERSION}-tiles`;
 const FONT_CACHE = `${VERSION}-fonts`;
 
 // ---------------------------------------------------------------------------
-// Helpers
+// URL helpers
 // ---------------------------------------------------------------------------
 
 function getScopeUrl() {
@@ -25,7 +25,7 @@ function isApiRequest(url) {
 }
 
 function isFontRequest(url) {
-  // FIX: use endsWith instead of includes to prevent subdomain spoofing
+  // FIX: use endsWith instead of includes — prevents evil-fonts.googleapis.com.attacker.com bypass
   return (
     url.origin.endsWith("fonts.googleapis.com") ||
     url.origin.endsWith("fonts.gstatic.com")
@@ -50,7 +50,8 @@ function isNavigationRequest(request) {
 // Caching strategies
 // ---------------------------------------------------------------------------
 
-// FIX: wrapped fetch in try/catch so a network failure returns a safe fallback
+// FIX: wrapped fetch in try/catch — a network failure no longer throws an
+// unhandled rejection. Returns Response.error() as a safe fallback.
 async function cacheFirst(request, cacheName) {
   const cache = await caches.open(cacheName);
   const cached = await cache.match(request);
@@ -67,9 +68,11 @@ async function cacheFirst(request, cacheName) {
   }
 }
 
-// FIX: networkPromise was a Promise (always truthy), not awaited properly.
-// Now: return cache immediately if available (fire-and-forget revalidation),
-// otherwise await the network.
+// FIX: `cached || networkPromise || Response.error()` was broken because
+// networkPromise is a Promise (always truthy) so Response.error() was
+// unreachable and the caller would receive a Promise instead of a Response.
+// Now: return the cache hit immediately and let the network update run in the
+// background; if there is no cache hit, await the network result.
 async function staleWhileRevalidate(request, cacheName) {
   const cache = await caches.open(cacheName);
   const cached = await cache.match(request);
@@ -84,52 +87,56 @@ async function staleWhileRevalidate(request, cacheName) {
     .catch(() => undefined);
 
   if (cached) {
-    // Background revalidation — don't await
-    networkPromise;
+    networkPromise; // fire-and-forget background revalidation
     return cached;
   }
 
   return (await networkPromise) ?? Response.error();
 }
 
-// Serve the cached shell index for navigation requests (SPA routing).
-// Falls back to a minimal offline page if the shell isn't cached yet.
+// Serve the cached SPA shell for all navigation requests (client-side routing).
+// Falls back to an inline offline page when the shell is not yet cached.
 async function handleNavigation() {
   const cache = await caches.open(APP_SHELL_CACHE);
-  const cached = await cache.match(resolveAppUrl("index.html"));
+  const cached =
+    (await cache.match(resolveAppUrl("index.html"))) ||
+    (await cache.match(resolveAppUrl("./")));
+
   if (cached) return cached;
 
-  // Minimal offline fallback — kept inline so no extra file is needed
+  // Inline offline fallback — no extra file required in /public
   return new Response(
     `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Brgy SOS — Offline</title>
     <style>
-      body { font-family: sans-serif; display: flex; flex-direction: column;
-             align-items: center; justify-content: center; min-height: 100vh;
-             margin: 0; background: #f5f5f5; color: #333; text-align: center; }
-      h1 { color: #c0392b; }
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{font-family:monospace;display:flex;flex-direction:column;
+           align-items:center;justify-content:center;min-height:100vh;
+           background:#040B1A;color:#fff;text-align:center;gap:12px}
+      h1{color:#FF3B5C;font-size:1.4rem;letter-spacing:.1em}
+      p{color:rgba(255,255,255,.4);font-size:.8rem}
     </style>
   </head>
   <body>
-    <h1>⚠️ You are offline</h1>
-    <p>Please check your internet connection and try again.</p>
+    <h1>⚠ OFFLINE</h1>
+    <p>No network connection.<br>Please reconnect and refresh.</p>
   </body>
 </html>`,
-    { headers: { "Content-Type": "text/html" } },
+    { headers: { "Content-Type": "text/html; charset=utf-8" } },
   );
 }
 
 // ---------------------------------------------------------------------------
-// Lifecycle events
+// Install — FIX: skipWaiting() moved INSIDE waitUntil so the SW only
+// activates after the app shell is fully cached, eliminating the race
+// condition where the SW could start intercepting fetches before the shell
+// was available.
 // ---------------------------------------------------------------------------
-
 self.addEventListener("install", (event) => {
-  // FIX: skipWaiting moved INSIDE waitUntil so the SW only activates
-  // after the app shell is fully cached, preventing a race condition.
   event.waitUntil(
     (async () => {
       const cache = await caches.open(APP_SHELL_CACHE);
@@ -140,11 +147,15 @@ self.addEventListener("install", (event) => {
         resolveAppUrl("favicon.svg"),
         resolveAppUrl("pwa-icon.svg"),
       ]);
+      // Only skip waiting after the shell is ready
       await self.skipWaiting();
     })(),
   );
 });
 
+// ---------------------------------------------------------------------------
+// Activate — clean up old versioned caches
+// ---------------------------------------------------------------------------
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
@@ -159,6 +170,9 @@ self.addEventListener("activate", (event) => {
   );
 });
 
+// ---------------------------------------------------------------------------
+// Message — allow the app to trigger an immediate SW swap
+// ---------------------------------------------------------------------------
 self.addEventListener("message", (event) => {
   if (event.data?.type === "SKIP_WAITING") {
     self.skipWaiting();
@@ -168,46 +182,48 @@ self.addEventListener("message", (event) => {
 // ---------------------------------------------------------------------------
 // Fetch routing
 // ---------------------------------------------------------------------------
-
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Ignore non-GET requests — let them pass through untouched
+  // Ignore non-GET — let POST/PATCH/DELETE pass through untouched
   if (request.method !== "GET") return;
 
-  // API calls: always network-only (never cache sensitive data)
+  // 1. API calls — always network-only; never cache auth/user/alert data
   if (isApiRequest(url)) {
     event.respondWith(fetch(request));
     return;
   }
 
-  // Google Fonts: cache-first (rarely changes, cross-origin)
+  // 2. Google Fonts — cache-first (cross-origin, immutable after first load)
   if (isFontRequest(url)) {
     event.respondWith(cacheFirst(request, FONT_CACHE));
     return;
   }
 
-  // Map tiles: cache-first (static tiles, large volume)
+  // 3. CartoDB map tiles — cache-first (static raster tiles, high volume)
   if (isMapTileRequest(url)) {
     event.respondWith(cacheFirst(request, TILE_CACHE));
     return;
   }
 
-  // Static assets (JS, CSS, images, workers): stale-while-revalidate
+  // 4. Static assets (JS bundles, CSS, images, web workers)
+  //    stale-while-revalidate: instant response + background update
   if (isStaticAsset(request)) {
     event.respondWith(staleWhileRevalidate(request, RUNTIME_CACHE));
     return;
   }
 
-  // Navigation requests: serve app shell for SPA client-side routing
+  // 5. Navigation (page loads / SPA route changes) — serve the app shell
+  //    so Wouter can handle client-side routing without a 404
   if (isNavigationRequest(request)) {
     event.respondWith(handleNavigation());
     return;
   }
 
-  // Default: stale-while-revalidate for anything else same-origin
+  // 6. Everything else same-origin (e.g. webmanifest, misc XHR)
   if (isSameOrigin(url)) {
     event.respondWith(staleWhileRevalidate(request, RUNTIME_CACHE));
   }
+  // Cross-origin requests not matched above fall through to the network
 });
