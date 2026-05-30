@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { eq, sql, and, gte } from "drizzle-orm";
+import { eq, sql, and, gte, avg } from "drizzle-orm";
 import { db, alertsTable, usersTable, patrolsTable, tanodActivityLogsTable } from "@workspace/db";
 import { requireAuth } from "../middlewares/requireAuth";
 
@@ -21,6 +21,20 @@ router.get("/stats/dashboard", requireAuth, async (_req, res): Promise<void> => 
   const [totalResidentsRow] = await db.select({ count: sql<number>`count(*)::int` }).from(usersTable)
     .where(eq(usersTable.role, "resident"));
 
+  // FIX: compute real avg response time from DB instead of hardcoding 12.5
+  const [avgRow] = await db.select({
+    avgMs: avg(
+      sql<number>`extract(epoch from (${alertsTable.respondedAt} - ${alertsTable.createdAt})) * 1000`,
+    ),
+  })
+    .from(alertsTable)
+    .where(sql`${alertsTable.respondedAt} is not null`);
+
+  const avgResponseTimeMinutes =
+    avgRow?.avgMs != null
+      ? Math.round((Number(avgRow.avgMs) / 60000) * 10) / 10
+      : null;
+
   res.json({
     totalAlerts: totalAlertsRow?.count ?? 0,
     activeAlerts: activeAlertsRow?.count ?? 0,
@@ -28,7 +42,7 @@ router.get("/stats/dashboard", requireAuth, async (_req, res): Promise<void> => 
     activeTanods: activeTanodsRow?.count ?? 0,
     pendingUsers: pendingUsersRow?.count ?? 0,
     totalResidents: totalResidentsRow?.count ?? 0,
-    avgResponseTimeMinutes: 12.5,
+    avgResponseTimeMinutes,
   });
 });
 
@@ -65,18 +79,44 @@ router.get("/stats/recent-activity", requireAuth, async (_req, res): Promise<voi
   res.json(items.slice(0, 15));
 });
 
+// FIX: removed Math.random() for avgResponseTimeMinutes — now computed from
+// real responded_at / created_at timestamps. Returns null when no data yet.
 router.get("/stats/tanod-performance", requireAuth, async (_req, res): Promise<void> => {
   const tanods = await db.select().from(usersTable).where(eq(usersTable.role, "tanod"));
+
   const result = await Promise.all(tanods.map(async (t) => {
-    const [countRow] = await db.select({ count: sql<number>`count(*)::int` }).from(alertsTable)
+    const [countRow] = await db
+      .select({ count: sql<number>`count(*)::int` })
+      .from(alertsTable)
       .where(eq(alertsTable.respondedBy, t.id));
+
+    const [avgRow] = await db
+      .select({
+        avgMs: avg(
+          sql<number>`extract(epoch from (${alertsTable.respondedAt} - ${alertsTable.createdAt})) * 1000`,
+        ),
+      })
+      .from(alertsTable)
+      .where(
+        and(
+          eq(alertsTable.respondedBy, t.id),
+          sql`${alertsTable.respondedAt} is not null`,
+        ),
+      );
+
+    const avgResponseTimeMinutes =
+      avgRow?.avgMs != null
+        ? Math.round((Number(avgRow.avgMs) / 60000) * 10) / 10
+        : null;
+
     return {
       tanodId: t.id,
       tanodName: t.name,
       alertsResponded: countRow?.count ?? 0,
-      avgResponseTimeMinutes: Math.round((Math.random() * 20 + 3) * 10) / 10,
+      avgResponseTimeMinutes,
     };
   }));
+
   res.json(result);
 });
 
