@@ -1,352 +1,300 @@
-@import "tailwindcss";
-@import "tw-animate-css";
-@plugin "@tailwindcss/typography";
-
-@custom-variant dark (&:is(.dark *));
-
-@theme inline {
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-  --color-card-border: hsl(var(--card-border));
-
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
-  --color-popover-border: hsl(var(--popover-border));
-
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-  --color-primary-border: var(--primary-border);
-
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-  --color-secondary-border: var(--secondary-border);
-
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-muted-border: var(--muted-border);
-
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
-  --color-accent-border: var(--accent-border);
-
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
-  --color-destructive-border: var(--destructive-border);
-
-  --color-chart-1: hsl(var(--chart-1));
-  --color-chart-2: hsl(var(--chart-2));
-  --color-chart-3: hsl(var(--chart-3));
-  --color-chart-4: hsl(var(--chart-4));
-  --color-chart-5: hsl(var(--chart-5));
-
-  --color-sidebar: hsl(var(--sidebar));
-  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
-  --color-sidebar-border: hsl(var(--sidebar-border));
-  --color-sidebar-primary: hsl(var(--sidebar-primary));
-  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
-  --color-sidebar-primary-border: var(--sidebar-primary-border);
-  --color-sidebar-accent: hsl(var(--sidebar-accent));
-  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
-  --color-sidebar-accent-border: var(--sidebar-accent-border);
-  --color-sidebar-ring: hsl(var(--sidebar-ring));
-
-  --font-sans: var(--app-font-sans);
-  --font-serif: var(--app-font-serif);
-  --font-mono: var(--app-font-mono);
-
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-}
-
-:root {
-  --button-outline: rgba(255,255,255, .10);
-  --badge-outline: rgba(255,255,255, .05);
-
-  --opaque-button-border-intensity: -8; 
-
-  --elevate-1: rgba(255,255,255, .03);
-  --elevate-2: rgba(255,255,255, .08);
-
-  /* Dark navy/black */
-  --background: 222 47% 5%;
-  --foreground: 210 40% 95%;
-
-  /* Dark navy cards */
-  --card: 222 40% 9%;
-  --card-foreground: 210 40% 95%;
-  --card-border: 222 30% 15%;
-
-  --sidebar: 222 40% 9%;
-  --sidebar-foreground: 210 40% 95%;
-  --sidebar-border: 222 30% 15%;
-  --sidebar-primary: 0 84% 50%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 222 30% 20%;
-  --sidebar-accent-foreground: 210 40% 95%;
-  --sidebar-ring: 0 84% 50%;
-
-  --popover: 222 40% 9%;
-  --popover-foreground: 210 40% 95%;
-  --popover-border: 222 30% 15%;
-
-  /* Emergency Red */
-  --primary: 0 84% 50%;
-  --primary-foreground: 0 0% 100%;
-
-  --secondary: 222 30% 20%;
-  --secondary-foreground: 210 40% 95%;
-
-  --muted: 215 16% 47%;
-  --muted-foreground: 215 20% 65%;
-
-  /* Cyan Accent */
-  --accent: 198 80% 50%;
-  --accent-foreground: 0 0% 100%;
-
-  --destructive: 0 84% 50%;
-  --destructive-foreground: 0 0% 100%;
-
-  --border: 222 30% 15%;
-  --input: 222 30% 15%;
-  --ring: 0 84% 50%;
-  
-  --chart-1: 0 84% 50%;
-  --chart-2: 198 80% 50%;
-  --chart-3: 30 80% 55%;
-  --chart-4: 280 65% 60%;
-  --chart-5: 160 60% 45%;
-
-  --app-font-sans: 'Inter', sans-serif;
-  --app-font-serif: Georgia, serif;
-  --app-font-mono: Menlo, monospace;
-  --radius: 0.25rem;
-  
-  --shadow-2xs: 0px 2px 0px 0px hsl(0 84% 50% / 0.1);
-  --shadow-xs: 0px 2px 0px 0px hsl(0 84% 50% / 0.1);
-  --shadow-sm: 0px 2px 0px 0px hsl(0 84% 50% / 0.1), 0px 1px 2px -1px hsl(0 84% 50% / 0.1);
-  --shadow: 0px 2px 0px 0px hsl(0 84% 50% / 0.1), 0px 1px 2px -1px hsl(0 84% 50% / 0.1);
-  --shadow-md: 0px 2px 0px 0px hsl(0 84% 50% / 0.1), 0px 2px 4px -1px hsl(0 84% 50% / 0.1);
-  --shadow-lg: 0px 2px 0px 0px hsl(0 84% 50% / 0.1), 0px 4px 6px -1px hsl(0 84% 50% / 0.1);
-  --shadow-xl: 0px 2px 0px 0px hsl(0 84% 50% / 0.1), 0px 8px 10px -1px hsl(0 84% 50% / 0.1);
-  --shadow-2xl: 0px 2px 0px 0px hsl(0 84% 50% / 0.1);
-  --tracking-normal: 0em;
-  --spacing: 0.25rem;
-
-  --color-tactical-blue: #00AEEF;
-  --color-tactical-cyan: #00F0FF;
-  --color-tactical-red: #FF3B5C;
-  --color-tactical-dark: #040B1A;
-  --color-tactical-emergency: #FF3B30;
-  --color-tactical-amber: #F59E0B;
-  --color-tactical-emerald: #10B981;
-  --color-tactical-purple: #A855F7;
-  --color-tactical-rose: #F43F5E;
-  --color-tactical-indigo: #6366F1;
-  --color-tactical-teal: #14B8A6;
-  --color-tactical-slate: #94A3B8;
-
-  --font-display: 'Orbitron', sans-serif;
-  --font-mono: 'Rajdhani', monospace;
-  --font-sans: 'Rajdhani', ui-sans-serif, system-ui, sans-serif;
-
-  --shadow-tactical: 0 0 30px rgba(0,170,255,0.35);
-  --shadow-glow-red: 0 0 30px rgba(255,59,48,0.35);
-  --shadow-glow-cyan: 0 0 30px rgba(0,240,255,0.35);
-
-  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  --animate-shake: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-  --animate-radar-sweep: radarSweep 4s linear infinite;
-  --animate-pulse-glow: pulseGlow 3s ease-in-out infinite;
-  --animate-slide-in: slideIn 0.3s ease-out;
-
-  --sidebar-primary-border: hsl(var(--sidebar-primary));
-  --sidebar-primary-border: hsl(from hsl(var(--sidebar-primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --sidebar-accent-border: hsl(var(--sidebar-accent));
-  --sidebar-accent-border: hsl(from hsl(var(--sidebar-accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --primary-border: hsl(var(--primary));
-  --primary-border: hsl(from hsl(var(--primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --secondary-border: hsl(var(--secondary));
-  --secondary-border: hsl(from hsl(var(--secondary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --muted-border: hsl(var(--muted));
-  --muted-border: hsl(from hsl(var(--muted)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --accent-border: hsl(var(--accent));
-  --accent-border: hsl(from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-  --destructive-border: hsl(var(--destructive));
-  --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
-}
-
-.dark {
-  /* Same as root because it's a dark theme by default */
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-
-  body {
-    @apply font-sans antialiased bg-background text-foreground;
-  }
-}
-
-@layer utilities {
-  input[type="search"]::-webkit-search-cancel-button {
-    @apply hidden;
-  }
-
-  [contenteditable][data-placeholder]:empty::before {
-    content: attr(data-placeholder);
-    color: hsl(var(--muted-foreground));
-    pointer-events: none;
-  }
-
-  .no-default-hover-elevate {}
-  .no-default-active-elevate {}
-
-  .toggle-elevate::before,
-  .toggle-elevate-2::before {
-    content: "";
-    pointer-events: none;
-    position: absolute;
-    inset: 0px;
-    border-radius: inherit;
-    z-index: -1;
-  }
-
-  .toggle-elevate.toggle-elevated::before {
-    background-color: var(--elevate-2);
-  }
-
-  .border.toggle-elevate::before {
-    inset: -1px;
-  }
-
-  .hover-elevate:not(.no-default-hover-elevate),
-  .active-elevate:not(.no-default-active-elevate),
-  .hover-elevate-2:not(.no-default-hover-elevate),
-  .active-elevate-2:not(.no-default-active-elevate) {
-    position: relative;
-    z-index: 0;
-  }
-
-  .hover-elevate:not(.no-default-hover-elevate)::after,
-  .active-elevate:not(.no-default-active-elevate)::after,
-  .hover-elevate-2:not(.no-default-hover-elevate)::after,
-  .active-elevate-2:not(.no-default-active-elevate)::after {
-    content: "";
-    pointer-events: none;
-    position: absolute;
-    inset: 0px;
-    border-radius: inherit;
-    z-index: 999;
-  }
-
-  .hover-elevate:hover:not(.no-default-hover-elevate)::after,
-  .active-elevate:active:not(.no-default-active-elevate)::after {
-    background-color: var(--elevate-1);
-  }
-
-  .hover-elevate-2:hover:not(.no-default-hover-elevate)::after,
-  .active-elevate-2:active:not(.no-default-active-elevate)::after {
-    background-color: var(--elevate-2);
-  }
-
-  .border.hover-elevate:not(.no-hover-interaction-elevate)::after,
-  .border.active-elevate:not(.no-active-interaction-elevate)::after,
-  .border.hover-elevate-2:not(.no-hover-interaction-elevate)::after,
-  .border.active-elevate-2:not(.no-active-interaction-elevate)::after,
-  .border.hover-elevate:not(.no-hover-interaction-elevate)::after {
-    inset: -1px;
-  }
-
-  .tactical-panel {
-    background: rgba(8, 15, 30, 0.78);
-    backdrop-filter: blur(18px);
-    border: 1px solid rgba(0, 170, 255, 0.25);
-    box-shadow: 0 0 20px rgba(0, 170, 255, 0.12), inset 0 0 30px rgba(0, 170, 255, 0.05);
-    border-radius: 24px;
-  }
-
-  .glass-panel {
-    background: rgba(8, 15, 30, 0.78);
-    backdrop-filter: blur(18px);
-    border: 1px solid rgba(0, 170, 255, 0.25);
-    box-shadow: 0 0 20px rgba(0, 170, 255, 0.12), inset 0 0 30px rgba(0, 170, 255, 0.05);
-    border-radius: 24px;
-  }
-
-  .tactical-grid {
-    background-image:
-      linear-gradient(rgba(0, 170, 255, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0, 170, 255, 0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-  }
-
-  .sos-glow {
-    box-shadow: 0 0 20px rgba(255, 59, 48, 0.5), 0 0 60px rgba(255, 59, 48, 0.3);
-  }
-
-  .cyan-glow {
-    box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
-  }
-
-  .font-display {
-    font-family: 'Orbitron', sans-serif;
-  }
-
-  .font-mono {
-    font-family: 'Rajdhani', monospace;
-  }
-
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
-    20%, 40%, 60%, 80% { transform: translateX(4px); }
-  }
-
-  @keyframes pulseGlow {
-    0% { box-shadow: 0 0 8px rgba(0,170,255,0.2); }
-    50% { box-shadow: 0 0 20px rgba(0,170,255,0.5), 0 0 40px rgba(0,170,255,0.3); }
-    100% { box-shadow: 0 0 8px rgba(0,170,255,0.2); }
-  }
-
-  @keyframes radarSweep {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-
-  @keyframes slideIn {
-    from { transform: translateY(-100%); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-  }
-
-  @keyframes flashRed {
-    0% { background-color: transparent; }
-    50% { background-color: rgba(255, 59, 48, 0.15); }
-    100% { background-color: transparent; }
-  }
-
-  .animate-flash-red {
-    animation: flashRed 2s ease-in-out infinite;
-  }
-
-  .animate-pulse-glow {
-    animation: pulseGlow 3s ease-in-out infinite;
-  }
-
-  .animate-radar-sweep {
-    animation: radarSweep 4s linear infinite;
-  }
-
-  .animate-shake {
-    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-  }
-}
+     1	@import "tailwindcss";
+     2	@import "tw-animate-css";
+     3	@plugin "@tailwindcss/typography";
+     4	
+     5	@custom-variant dark (&:is(.dark *));
+     6	
+     7	@theme inline {
+     8	  --color-background: hsl(var(--background));
+     9	  --color-foreground: hsl(var(--foreground));
+    10	  --color-border: hsl(var(--border));
+    11	  --color-input: hsl(var(--input));
+    12	  --color-ring: hsl(var(--ring));
+    13	
+    14	  --color-card: hsl(var(--card));
+    15	  --color-card-foreground: hsl(var(--card-foreground));
+    16	  --color-card-border: hsl(var(--card-border));
+    17	
+    18	  --color-popover: hsl(var(--popover));
+    19	  --color-popover-foreground: hsl(var(--popover-foreground));
+    20	  --color-popover-border: hsl(var(--popover-border));
+    21	
+    22	  --color-primary: hsl(var(--primary));
+    23	  --color-primary-foreground: hsl(var(--primary-foreground));
+    24	  --color-primary-border: var(--primary-border);
+    25	
+    26	  --color-secondary: hsl(var(--secondary));
+    27	  --color-secondary-foreground: hsl(var(--secondary-foreground));
+    28	  --color-secondary-border: var(--secondary-border);
+    29	
+    30	  --color-muted: hsl(var(--muted));
+    31	  --color-muted-foreground: hsl(var(--muted-foreground));
+    32	  --color-muted-border: var(--muted-border);
+    33	
+    34	  --color-accent: hsl(var(--accent));
+    35	  --color-accent-foreground: hsl(var(--accent-foreground));
+    36	  --color-accent-border: var(--accent-border);
+    37	
+    38	  --color-destructive: hsl(var(--destructive));
+    39	  --color-destructive-foreground: hsl(var(--destructive-foreground));
+    40	  --color-destructive-border: var(--destructive-border);
+    41	
+    42	  --color-chart-1: hsl(var(--chart-1));
+    43	  --color-chart-2: hsl(var(--chart-2));
+    44	  --color-chart-3: hsl(var(--chart-3));
+    45	  --color-chart-4: hsl(var(--chart-4));
+    46	  --color-chart-5: hsl(var(--chart-5));
+    47	
+    48	  --color-sidebar: hsl(var(--sidebar));
+    49	  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+    50	  --color-sidebar-border: hsl(var(--sidebar-border));
+    51	  --color-sidebar-primary: hsl(var(--sidebar-primary));
+    52	  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+    53	  --color-sidebar-primary-border: var(--sidebar-primary-border);
+    54	  --color-sidebar-accent: hsl(var(--sidebar-accent));
+    55	  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+    56	  --color-sidebar-accent-border: var(--sidebar-accent-border);
+    57	  --color-sidebar-ring: hsl(var(--sidebar-ring));
+    58	
+    59	  --font-sans: var(--app-font-sans);
+    60	  --font-serif: var(--app-font-serif);
+    61	  --font-mono: var(--app-font-mono);
+    62	
+    63	  --radius-sm: calc(var(--radius) - 4px);
+    64	  --radius-md: calc(var(--radius) - 2px);
+    65	  --radius-lg: var(--radius);
+    66	  --radius-xl: calc(var(--radius) + 4px);
+    67	}
+    68	
+    69	:root {
+    70	  --button-outline: rgba(255,255,255, .10);
+    71	  --badge-outline: rgba(255,255,255, .05);
+    72	
+    73	  --opaque-button-border-intensity: -8; 
+    74	
+    75	  --elevate-1: rgba(255,255,255, .03);
+    76	  --elevate-2: rgba(255,255,255, .08);
+    77	
+    78	  /* Dark navy/black */
+    79	  --background: 222 47% 5%;
+    80	  --foreground: 210 40% 95%;
+    81	
+    82	  /* Dark navy cards */
+    83	  --card: 222 40% 9%;
+    84	  --card-foreground: 210 40% 95%;
+    85	  --card-border: 222 30% 15%;
+    86	
+    87	  --sidebar: 222 40% 9%;
+    88	  --sidebar-foreground: 210 40% 95%;
+    89	  --sidebar-border: 222 30% 15%;
+    90	  --sidebar-primary: 0 84% 50%;
+    91	  --sidebar-primary-foreground: 0 0% 100%;
+    92	  --sidebar-accent: 222 30% 20%;
+    93	  --sidebar-accent-foreground: 210 40% 95%;
+    94	  --sidebar-ring: 0 84% 50%;
+    95	
+    96	  --popover: 222 40% 9%;
+    97	  --popover-foreground: 210 40% 95%;
+    98	  --popover-border: 222 30% 15%;
+    99	
+   100	  /* Emergency Red */
+   101	  --primary: 0 84% 50%;
+   102	  --primary-foreground: 0 0% 100%;
+   103	
+   104	  --secondary: 222 30% 20%;
+   105	  --secondary-foreground: 210 40% 95%;
+   106	
+   107	  --muted: 215 16% 47%;
+   108	  --muted-foreground: 215 20% 65%;
+   109	
+   110	  /* Cyan Accent */
+   111	  --accent: 198 80% 50%;
+   112	  --accent-foreground: 0 0% 100%;
+   113	
+   114	  --destructive: 0 84% 50%;
+   115	  --destructive-foreground: 0 0% 100%;
+   116	
+   117	  --border: 222 30% 15%;
+   118	  --input: 222 30% 15%;
+   119	  --ring: 0 84% 50%;
+   120	  
+   121	  --chart-1: 0 84% 50%;
+   122	  --chart-2: 198 80% 50%;
+   123	  --chart-3: 30 80% 55%;
+   124	  --chart-4: 280 65% 60%;
+   125	  --chart-5: 160 60% 45%;
+   126	
+   127	  --app-font-sans: 'Inter', sans-serif;
+   128	  --app-font-serif: Georgia, serif;
+   129	  --app-font-mono: Menlo, monospace;
+   130	  --radius: 0.25rem;
+   131	  
+   132	  --shadow-2xs: 0px 2px 0px 0px hsl(0 84% 50% / 0.1);
+   133	  --shadow-xs: 0px 2px 0px 0px hsl(0 84% 50% / 0.1);
+   134	  --shadow-sm: 0px 2px 0px 0px hsl(0 84% 50% / 0.1), 0px 1px 2px -1px hsl(0 84% 50% / 0.1);
+   135	  --shadow: 0px 2px 0px 0px hsl(0 84% 50% / 0.1), 0px 1px 2px -1px hsl(0 84% 50% / 0.1);
+   136	  --shadow-md: 0px 2px 0px 0px hsl(0 84% 50% / 0.1), 0px 2px 4px -1px hsl(0 84% 50% / 0.1);
+   137	  --shadow-lg: 0px 2px 0px 0px hsl(0 84% 50% / 0.1), 0px 4px 6px -1px hsl(0 84% 50% / 0.1);
+   138	  --shadow-xl: 0px 2px 0px 0px hsl(0 84% 50% / 0.1), 0px 8px 10px -1px hsl(0 84% 50% / 0.1);
+   139	  --shadow-2xl: 0px 2px 0px 0px hsl(0 84% 50% / 0.1);
+   140	  --tracking-normal: 0em;
+   141	  --spacing: 0.25rem;
+   142	
+   143	  --color-tactical-blue: #00AEEF;
+   144	  --color-tactical-cyan: #00F0FF;
+   145	  --color-tactical-red: #FF3B5C;
+   146	  --color-tactical-dark: #040B1A;
+   147	  --color-tactical-emergency: #FF3B30;
+   148	  --color-tactical-amber: #F59E0B;
+   149	  --color-tactical-emerald: #10B981;
+   150	  --color-tactical-purple: #A855F7;
+   151	  --color-tactical-rose: #F43F5E;
+   152	  --color-tactical-indigo: #6366F1;
+   153	  --color-tactical-teal: #14B8A6;
+   154	  --color-tactical-slate: #94A3B8;
+   155	
+   156	  --font-display: 'Orbitron', sans-serif;
+   157	  --font-mono: 'Rajdhani', monospace;
+   158	  --font-sans: 'Rajdhani', ui-sans-serif, system-ui, sans-serif;
+   159	
+   160	  --shadow-tactical: 0 0 30px rgba(0,170,255,0.35);
+   161	  --shadow-glow-red: 0 0 30px rgba(255,59,48,0.35);
+   162	  --shadow-glow-cyan: 0 0 30px rgba(0,240,255,0.35);
+   163	
+   164	  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+   165	  --animate-shake: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+   166	  --animate-radar-sweep: radarSweep 4s linear infinite;
+   167	  --animate-pulse-glow: pulseGlow 3s ease-in-out infinite;
+   168	  --animate-slide-in: slideIn 0.3s ease-out;
+   169	
+   170	  --sidebar-primary-border: hsl(var(--sidebar-primary));
+   171	  --sidebar-primary-border: hsl(from hsl(var(--sidebar-primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+   172	  --sidebar-accent-border: hsl(var(--sidebar-accent));
+   173	  --sidebar-accent-border: hsl(from hsl(var(--sidebar-accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+   174	  --primary-border: hsl(var(--primary));
+   175	  --primary-border: hsl(from hsl(var(--primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+   176	  --secondary-border: hsl(var(--secondary));
+   177	  --secondary-border: hsl(from hsl(var(--secondary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+   178	  --muted-border: hsl(var(--muted));
+   179	  --muted-border: hsl(from hsl(var(--muted)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+   180	  --accent-border: hsl(var(--accent));
+   181	  --accent-border: hsl(from hsl(var(--accent)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+   182	  --destructive-border: hsl(var(--destructive));
+   183	  --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+   184	}
+   185	
+   186	.dark {
+   187	  /* Same as root because it's a dark theme by default */
+   188	}
+   189	
+   190	@layer base {
+   191	  * {
+   192	    @apply border-border;
+   193	  }
+   194	
+   195	  body {
+   196	    @apply font-sans antialiased bg-background text-foreground;
+   197	  }
+   198	}
+   199	
+   200	@layer utilities {
+   201	  input[type="search"]::-webkit-search-cancel-button {
+   202	    @apply hidden;
+   203	  }
+   204	
+   205	  [contenteditable][data-placeholder]:empty::before {
+   206	    content: attr(data-placeholder);
+   207	    color: hsl(var(--muted-foreground));
+   208	    pointer-events: none;
+   209	  }
+   210	
+   211	  .no-default-hover-elevate {}
+   212	  .no-default-active-elevate {}
+   213	
+   214	  .toggle-elevate::before,
+   215	  .toggle-elevate-2::before {
+   216	    content: "";
+   217	    pointer-events: none;
+   218	    position: absolute;
+   219	    inset: 0px;
+   220	    border-radius: inherit;
+   221	    z-index: -1;
+   222	  }
+   223	
+   224	  .toggle-elevate.toggle-elevated::before {
+   225	    background-color: var(--elevate-2);
+   226	  }
+   227	
+   228	  .border.toggle-elevate::before {
+   229	    inset: -1px;
+   230	  }
+   231	
+   232	  .hover-elevate:not(.no-default-hover-elevate),
+   233	  .active-elevate:not(.no-default-active-elevate),
+   234	  .hover-elevate-2:not(.no-default-hover-elevate),
+   235	  .active-elevate-2:not(.no-default-active-elevate) {
+   236	    position: relative;
+   237	    z-index: 0;
+   238	  }
+   239	
+   240	  .hover-elevate:not(.no-default-hover-elevate)::after,
+   241	  .active-elevate:not(.no-default-active-elevate)::after,
+   242	  .hover-elevate-2:not(.no-default-hover-elevate)::after,
+   243	  .active-elevate-2:not(.no-default-active-elevate)::after {
+   244	    content: "";
+   245	    pointer-events: none;
+   246	    position: absolute;
+   247	    inset: 0px;
+   248	    border-radius: inherit;
+   249	    z-index: 999;
+   250	  }
+   251	
+   252	  .hover-elevate:hover:not(.no-default-hover-elevate)::after,
+   253	  .active-elevate:active:not(.no-default-active-elevate)::after {
+   254	    background-color: var(--elevate-1);
+   255	  }
+   256	
+   257	  .hover-elevate-2:hover:not(.no-default-hover-elevate)::after,
+   258	  .active-elevate-2:active:not(.no-default-active-elevate)::after {
+   259	    background-color: var(--elevate-2);
+   260	  }
+   261	
+   262	  .border.hover-elevate:not(.no-hover-interaction-elevate)::after,
+   263	  .border.active-elevate:not(.no-active-interaction-elevate)::after,
+   264	  .border.hover-elevate-2:not(.no-hover-interaction-elevate)::after,
+   265	  .border.active-elevate-2:not(.no-active-interaction-elevate)::after,
+   266	  .border.hover-elevate:not(.no-hover-interaction-elevate)::after {
+   267	    inset: -1px;
+   268	  }
+   269	
+   270	  .tactical-panel {
+   271	    background: rgba(8, 15, 30, 0.78);
+   272	    backdrop-filter: blur(18px);
+   273	    border: 1px solid rgba(0, 170, 255, 0.25);
+   274	    box-shadow: 0 0 20px rgba(0, 170, 255, 0.12), inset 0 0 30px rgba(0, 170, 255, 0.05);
+   275	    border-radius: 24px;
+   276	  }
+   277	
+   278	  .glass-panel {
+   279	    background: rgba(8, 15, 30, 0.78);
+   280	    backdrop-filter: blur(18px);
+   281	    border: 1px solid rgba(0, 170, 255, 0.25);
+   282	    box-shadow: 0 0 20px rgba(0, 170, 255, 0.12), inset 0 0 30px rgba(0, 170, 255, 0.05);
+   283	    border-radius: 24px;
+   284	  }
+   285	
+   286	  .tactical-grid {
+   287	    background-image:
+   288	      linear-gradient(rgba(0, 170, 255, 0.03) 1px, transparent 1px),
+   289	      linear-gradient(90deg, rgba(0, 170, 255, 0.03) 1px, transparent 1px);
+   290	    background-size: 40px 40px;
+   291	  }
+   292	
+   293	  .sos-glow {
+   294	    box-shadow: 0 0 20px rgba(255, 59, 48, 0.5), 0 0 60px rgba(255, 59, 48, 0.3);
+   295	  }
+   296	
+   297	  .cyan-glow {
+   298	    box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+   299	  }
+   300	
