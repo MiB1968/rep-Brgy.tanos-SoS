@@ -10,6 +10,7 @@ import {
   useListShifts, getListShiftsQueryKey,
   useGetMyPatrol, getGetMyPatrolQueryKey,
   useUpdateMyPatrol,
+  Alert, Shift, PatrolUpdate
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
@@ -53,21 +54,21 @@ export default function TanodDashboard() {
   );
 
   const { data: myIncidents = [] } = useListIncidents(
-    {},
-    { query: { queryKey: getListIncidentsQueryKey({}) } }
+    { tanodId: user?.id },
+    { query: { queryKey: getListIncidentsQueryKey({ tanodId: user?.id }), enabled: !!user?.id } }
   );
 
   const { data: shifts = [] } = useListShifts(
-    {},
-    { query: { queryKey: getListShiftsQueryKey({}) } }
+    { tanodId: user?.id },
+    { query: { queryKey: getListShiftsQueryKey({ tanodId: user?.id }), enabled: !!user?.id } }
   );
 
-  const isOnDuty = (patrol as any)?.isActive ?? false;
+  const isOnDuty = patrol?.isActive ?? false;
 
   function toggleDuty() {
     const newStatus = !isOnDuty;
     updatePatrol.mutate(
-      { data: { isActive: newStatus, status: newStatus ? "patrolling" : "offline" } } as any,
+      { data: { isActive: newStatus, status: newStatus ? "patrolling" : "offline" } },
       {
         onSuccess: () => {
           toast({ title: newStatus ? "🟢 Now On Duty" : "⚫ Off Duty", description: newStatus ? "You are visible to admin dispatch" : "Patrol status updated" });
@@ -78,10 +79,10 @@ export default function TanodDashboard() {
   }
 
   const upcomingShifts = Array.isArray(shifts)
-    ? shifts.filter((s: any) => s.status === "scheduled").slice(0, 3)
+    ? (shifts as Shift[]).filter((s) => s.status === "scheduled").slice(0, 3)
     : [];
 
-  const activeAlerts = Array.isArray(alerts) ? alerts.filter((a: any) => a.status === "pending").length : 0;
+  const activeAlerts = Array.isArray(alerts) ? (alerts as Alert[]).filter((a) => a.status === "pending").length : 0;
 
   return (
     <motion.div
@@ -170,7 +171,7 @@ export default function TanodDashboard() {
               </div>
             ) : (
               <div className="space-y-2">
-                {Array.isArray(alerts) && alerts.slice(0, 5).map((a: any) => (
+                {Array.isArray(alerts) && (alerts as Alert[]).slice(0, 5).map((a) => (
                   <Link key={a.id} href={`/alerts/${a.id}`} data-testid={`card-alert-${a.id}`}>
                     <div className="tactical-panel border border-[#F59E0B]/20 rounded-[24px] px-4 py-3 hover:border-[#00F0FF]/40 transition-all flex items-center gap-3 cursor-pointer">
                       <span className="text-lg">{ALERT_ICONS[a.type] ?? "🚨"}</span>
@@ -196,7 +197,7 @@ export default function TanodDashboard() {
               </div>
             ) : (
               <div className="space-y-2">
-                {upcomingShifts.map((s: any) => (
+                {upcomingShifts.map((s) => (
                   <div key={s.id} className="tactical-panel border border-white/5 rounded-[24px] px-4 py-3 flex items-center gap-3">
                     <Calendar className="w-4 h-4 text-[#00F0FF] flex-shrink-0" />
                     <div className="flex-1">
