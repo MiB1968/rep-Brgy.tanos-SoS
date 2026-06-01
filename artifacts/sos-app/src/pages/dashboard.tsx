@@ -10,7 +10,7 @@ export default function DashboardPage() {
   return (
     <Layout>
       {user?.role === "resident" && <ResidentDashboard />}
-      {(user?.role === "tanod") && <TanodDashboard />}
+      {user?.role === "tanod" && <TanodDashboard />}
       {(user?.role === "admin" || user?.role === "superadmin") && <AdminDashboard />}
     </Layout>
   );
