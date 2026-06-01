@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Shield, UserPlus, Eye, EyeOff } from "lucide-react";
-import { useRegister } from "@workspace/api-client-react";
+import { useRegister, type RegisterMutationResult, type RegisterMutationError } from "@workspace/api-client-react";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,13 +36,13 @@ export default function RegisterPage() {
   });
 
   const onSubmit = (data: FormData) => {
-    registerMutation.mutate({ data } as any, {
-      onSuccess: (res: any) => {
-        login(res.user, res.token);
+    registerMutation.mutate({ data }, {
+      onSuccess: (res: RegisterMutationResult) => {
+        login(res.user as any, res.token);
         setLocation("/dashboard");
       },
-      onError: (err: any) => {
-        toast({ title: "Registration failed", description: err?.data?.error ?? "Could not register", variant: "destructive" });
+      onError: (err: RegisterMutationError) => {
+        toast({ title: "Registration failed", description: (err as any)?.data?.error ?? "Could not register", variant: "destructive" });
       },
     });
   };

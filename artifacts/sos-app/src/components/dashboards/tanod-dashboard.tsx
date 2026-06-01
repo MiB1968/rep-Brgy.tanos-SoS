@@ -79,10 +79,10 @@ export default function TanodDashboard() {
   }
 
   const upcomingShifts = Array.isArray(shifts)
-    ? (shifts as Shift[]).filter((s) => s.status === "scheduled").slice(0, 3)
+    ? shifts.filter((s) => s.status === "scheduled").slice(0, 3)
     : [];
 
-  const activeAlerts = Array.isArray(alerts) ? (alerts as Alert[]).filter((a) => a.status === "pending").length : 0;
+  const activeAlerts = Array.isArray(alerts) ? alerts.filter((a) => a.status === "pending").length : 0;
 
   return (
     <motion.div
@@ -171,7 +171,7 @@ export default function TanodDashboard() {
               </div>
             ) : (
               <div className="space-y-2">
-                {Array.isArray(alerts) && (alerts as Alert[]).slice(0, 5).map((a) => (
+                {Array.isArray(alerts) && alerts.slice(0, 5).map((a) => (
                   <Link key={a.id} href={`/alerts/${a.id}`} data-testid={`card-alert-${a.id}`}>
                     <div className="tactical-panel border border-[#F59E0B]/20 rounded-[24px] px-4 py-3 hover:border-[#00F0FF]/40 transition-all flex items-center gap-3 cursor-pointer">
                       <span className="text-lg">{ALERT_ICONS[a.type] ?? "🚨"}</span>

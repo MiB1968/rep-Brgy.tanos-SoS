@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Shield, AlertTriangle, Zap, Eye, EyeOff } from "lucide-react";
-import { useLogin } from "@workspace/api-client-react";
+import { useLogin, type LoginMutationResult, type LoginMutationError } from "@workspace/api-client-react";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,14 +32,20 @@ export default function LoginPage() {
 
   const onSubmit = (data: FormData) => {
     loginMutation.mutate({ data }, {
-      onSuccess: (res: any) => {
-        login(res.user, res.token);
+      onSuccess: (res: LoginMutationResult) => {
+        login(res.user as any, res.token);
         setLocation("/dashboard");
       },
-      onError: (err: any) => {
-        toast({ title: "Login failed", description: err?.data?.error ?? "Invalid credentials", variant: "destructive" });
+      onError: (err: LoginMutationError) => {
+        toast({ title: "Login failed", description: (err as any)?.data?.error ?? "Invalid credentials", variant: "destructive" });
       },
     });
+  };
+
+  const handleDemoLogin = (email: string, pass: string) => {
+    form.setValue("email", email);
+    form.setValue("password", pass);
+    form.handleSubmit(onSubmit)();
   };
 
   return (
@@ -108,12 +114,20 @@ export default function LoginPage() {
         </p>
 
         <div className="mt-6 tactical-panel p-3 border-white/5">
-          <p className="text-[10px] text-white/30 text-center mb-2 font-bold font-mono uppercase tracking-widest">Demo Accounts</p>
+          <p className="text-[10px] text-white/30 text-center mb-2 font-bold font-mono uppercase tracking-widest">Demo Accounts (Click to Fill)</p>
           <div className="grid grid-cols-2 gap-1 text-[10px] text-white/20 font-mono">
-            <div className="flex items-center gap-1"><Shield className="w-3 h-3 text-[#F59E0B]" /> admin@brgy.ph / admin123</div>
-            <div className="flex items-center gap-1"><Shield className="w-3 h-3 text-[#10B981]" /> tanod@brgy.ph / tanod123</div>
-            <div className="flex items-center gap-1"><Shield className="w-3 h-3 text-[#00AEEF]" /> resident@brgy.ph / resident123</div>
-            <div className="flex items-center gap-1"><Shield className="w-3 h-3 text-[#FF3B5C]" /> super@brgy.ph / super123</div>
+            <button onClick={() => handleDemoLogin("admin@brgy.ph", "admin123")} className="flex items-center gap-1 hover:bg-white/5 p-1 rounded transition-colors text-left">
+              <Shield className="w-3 h-3 text-[#F59E0B]" /> admin@brgy.ph
+            </button>
+            <button onClick={() => handleDemoLogin("tanod@brgy.ph", "tanod123")} className="flex items-center gap-1 hover:bg-white/5 p-1 rounded transition-colors text-left">
+              <Shield className="w-3 h-3 text-[#10B981]" /> tanod@brgy.ph
+            </button>
+            <button onClick={() => handleDemoLogin("resident@brgy.ph", "resident123")} className="flex items-center gap-1 hover:bg-white/5 p-1 rounded transition-colors text-left">
+              <Shield className="w-3 h-3 text-[#00AEEF]" /> resident@brgy.ph
+            </button>
+            <button onClick={() => handleDemoLogin("super@brgy.ph", "super123")} className="flex items-center gap-1 hover:bg-white/5 p-1 rounded transition-colors text-left">
+              <Shield className="w-3 h-3 text-[#FF3B5C]" /> super@brgy.ph
+            </button>
           </div>
         </div>
       </div>
