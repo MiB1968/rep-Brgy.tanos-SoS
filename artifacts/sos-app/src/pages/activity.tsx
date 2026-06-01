@@ -3,6 +3,7 @@ import { Layout } from "@/components/layout";
 import {
   useListTanodActivityLogs, getListTanodActivityLogsQueryKey,
   useCreateTanodActivityLog,
+  TanodActivityLogInput,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
@@ -49,7 +50,7 @@ export default function ActivityPage() {
   });
 
   function onSubmit(data: FormData) {
-    createLog.mutate({ data } as any, {
+    createLog.mutate({ data: data as TanodActivityLogInput }, {
       onSuccess: () => {
         toast({ title: "Activity logged" });
         setOpen(false);

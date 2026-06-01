@@ -45,13 +45,13 @@ export default function UsersPage() {
   const rejectUser = useRejectUser();
 
   function handleApprove(id: string) {
-    approveUser.mutate({ id } as any, {
+    approveUser.mutate({ id }, {
       onSuccess: () => { toast({ title: "User approved" }); qc.invalidateQueries({ queryKey: getListUsersQueryKey(params) }); },
     });
   }
 
   function handleReject(id: string) {
-    rejectUser.mutate({ id } as any, {
+    rejectUser.mutate({ id, data: {} }, {
       onSuccess: () => { toast({ title: "User rejected" }); qc.invalidateQueries({ queryKey: getListUsersQueryKey(params) }); },
     });
   }

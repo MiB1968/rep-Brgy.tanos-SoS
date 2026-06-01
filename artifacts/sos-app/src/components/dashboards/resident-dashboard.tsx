@@ -11,6 +11,7 @@ import {
   useListBroadcasts,
   getListAlertsQueryKey,
   getListBroadcastsQueryKey,
+  AlertInput,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
@@ -106,8 +107,8 @@ export default function ResidentDashboard() {
   );
 
   const { data: broadcasts = [] } = useListBroadcasts(
-    {},
-    { query: { queryKey: getListBroadcastsQueryKey({}) } }
+    undefined,
+    { query: { queryKey: getListBroadcastsQueryKey(undefined) } }
   );
 
   const activeAlert = Array.isArray(myAlerts)
@@ -163,7 +164,7 @@ export default function ResidentDashboard() {
   function doCreate(location: { lat: number; lng: number }, type = "OTHER", description = "SOS triggered by resident") {
     playSirenSound();
     createAlert.mutate(
-      { data: { type, location, description } } as any,
+      { data: { type, location, description } as AlertInput },
       {
         onSuccess: () => {
           toast({ title: "🚨 SOS Alert Sent!", description: "Tanods have been notified. Help is on the way." });
