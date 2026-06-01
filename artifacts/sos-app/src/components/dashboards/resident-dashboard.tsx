@@ -11,6 +11,7 @@ import {
   useListBroadcasts,
   getListAlertsQueryKey,
   getListBroadcastsQueryKey,
+  type Alert
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
@@ -102,7 +103,7 @@ export default function ResidentDashboard() {
 
   const { data: myAlerts = [] } = useListAlerts(
     { residentId: user?.id },
-    { query: { queryKey: getListAlertsQueryKey({ residentId: user?.id }) } }
+    { query: { queryKey: getListAlertsQueryKey({ residentId: user?.id }), enabled: !!user?.id } }
   );
 
   const { data: broadcasts = [] } = useListBroadcasts(
@@ -111,7 +112,7 @@ export default function ResidentDashboard() {
   );
 
   const activeAlert = Array.isArray(myAlerts)
-    ? myAlerts.find((a: any) => ["pending", "responding"].includes(a.status))
+    ? (myAlerts as Alert[]).find((a) => ["pending", "responding"].includes(a.status))
     : undefined;
 
   const startHold = useCallback(() => {
@@ -150,7 +151,7 @@ export default function ResidentDashboard() {
     } else doCreate(location);
   }
 
-  function handleTypedSOS(type: string, description: string) {
+  function handleTypedSOS(type: Alert["type"], description: string) {
     const location = { lat: 14.5995, lng: 120.9842 };
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -160,10 +161,10 @@ export default function ResidentDashboard() {
     } else doCreate(location, type, description);
   }
 
-  function doCreate(location: { lat: number; lng: number }, type = "OTHER", description = "SOS triggered by resident") {
+  function doCreate(location: { lat: number; lng: number }, type: Alert["type"] = "OTHER", description = "SOS triggered by resident") {
     playSirenSound();
     createAlert.mutate(
-      { data: { type, location, description } } as any,
+      { data: { type, location, description } },
       {
         onSuccess: () => {
           toast({ title: "🚨 SOS Alert Sent!", description: "Tanods have been notified. Help is on the way." });
@@ -222,7 +223,7 @@ export default function ResidentDashboard() {
                   <div>
                     <h4 className="text-xl font-black italic tracking-tighter text-white uppercase font-display">Incident Live</h4>
                     <p className="text-[9px] text-white/40 font-bold uppercase tracking-[0.2em] font-mono">
-                      {(activeAlert as any).status?.toUpperCase()} · {(activeAlert as any).type}
+                      {activeAlert.status?.toUpperCase()} · {activeAlert.type}
                     </p>
                   </div>
                 </div>
@@ -230,17 +231,17 @@ export default function ResidentDashboard() {
                   <div className="h-1.5 bg-[#040B1A] rounded-full overflow-hidden">
                     <motion.div
                       className="h-full bg-[#FF3B30] shadow-[0_0_15px_rgba(255,59,48,0.5)]"
-                      animate={{ width: STATUS_BAR[(activeAlert as any).status as string] || "33%" }}
+                      animate={{ width: STATUS_BAR[activeAlert.status as string] || "33%" }}
                     />
                   </div>
                   <div className="flex justify-between text-[7px] font-mono text-white/20 uppercase tracking-widest">
                     <span>Dispatch</span><span>En Route</span><span>On Scene</span>
                   </div>
                 </div>
-                {(activeAlert as any).respondedByName && (
-                  <p className="text-xs text-[#00F0FF]">Tanod {(activeAlert as any).respondedByName} is responding</p>
+                {activeAlert.respondedByName && (
+                  <p className="text-xs text-[#00F0FF]">Tanod {activeAlert.respondedByName} is responding</p>
                 )}
-                <Link href={`/alerts/${(activeAlert as any).id}`} className="text-xs text-[#00AEEF] hover:underline mt-1 block">View details</Link>
+                <Link href={`/alerts/${activeAlert.id}`} className="text-xs text-[#00AEEF] hover:underline mt-1 block">View details</Link>
               </div>
             </motion.div>
           )}
@@ -407,7 +408,7 @@ export default function ResidentDashboard() {
               </div>
             ) : (
               <div className="space-y-2">
-                {Array.isArray(broadcasts) && broadcasts.slice(0, 3).map((b: any) => (
+                {Array.isArray(broadcasts) && (broadcasts as any[]).slice(0, 3).map((b) => (
                   <div key={b.id} className="tactical-panel border border-[#00AEEF]/20 rounded-[24px] p-4">
                     <div className="flex items-center gap-2 mb-1">
                       <Radio className="w-3 h-3 text-[#00AEEF]" />
@@ -431,7 +432,7 @@ export default function ResidentDashboard() {
               </div>
             ) : (
               <div className="space-y-2">
-                {Array.isArray(myAlerts) && myAlerts.slice(0, 5).map((a: any) => (
+                {Array.isArray(myAlerts) && (myAlerts as Alert[]).slice(0, 5).map((a) => (
                   <Link key={a.id} href={`/alerts/${a.id}`} data-testid={`card-alert-${a.id}`}>
                     <div className="tactical-panel border border-white/5 rounded-[24px] px-4 py-3 hover:border-[#00AEEF]/40 transition-all flex items-center gap-3 cursor-pointer">
                       <span className="text-lg">{ALERT_TYPE_ICONS[a.type] ?? "🚨"}</span>

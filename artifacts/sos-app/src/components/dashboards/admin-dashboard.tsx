@@ -6,12 +6,13 @@ import {
   useGetRecentActivity, getGetRecentActivityQueryKey,
   useGetTanodPerformance, getGetTanodPerformanceQueryKey,
 } from "@workspace/api-client-react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import {
   AlertTriangle, Users, Shield, CheckCircle, Clock, UserCheck,
   Map as MapIcon, Activity, Calendar, Radio, FileText, PhoneCall,
   Cpu, Settings, Grid, Terminal, History, Eye, AlertOctagon,
-  ShieldAlert, Zap
+  ShieldAlert, Zap, BarChart,
+  type LucideIcon
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
@@ -28,7 +29,18 @@ const itemVariants = {
   show: { opacity: 1, y: 0 },
 };
 
-function StatCard({ label, value, icon: Icon, color, border, onClick, pulse }: any) {
+interface StatCardProps {
+  label: string;
+  value: string | number;
+  icon: LucideIcon;
+  color: string;
+  border: string;
+  onClick?: () => void;
+  pulse?: boolean;
+}
+
+function StatCard({ label, value, icon: Icon, color, border, onClick, pulse }: StatCardProps) {
+  const isHex = color.startsWith("#");
   return (
     <motion.div
       variants={itemVariants}
@@ -38,8 +50,11 @@ function StatCard({ label, value, icon: Icon, color, border, onClick, pulse }: a
         border
       )}
     >
-      <div className={cn("p-3 rounded-2xl inline-flex mb-4 transition-all shadow-2xl relative z-10", `bg-${color}/10`, color.startsWith("#") ? "" : color, pulse && "animate-pulse")}>
-        <Icon className={cn("w-5 h-5", color.startsWith("#") ? `text-[${color}]` : color)} />
+      <div
+        className={cn("p-3 rounded-2xl inline-flex mb-4 transition-all shadow-2xl relative z-10", pulse && "animate-pulse")}
+        style={{ backgroundColor: isHex ? `${color}1A` : undefined }}
+      >
+        <Icon className="w-5 h-5" style={{ color: isHex ? color : undefined }} />
       </div>
       <div className="relative z-10">
         <h4 className="text-[9px] font-black uppercase text-white/40 tracking-[0.4em] mb-2 font-mono">{label}</h4>
@@ -57,8 +72,7 @@ export default function AdminDashboard() {
   const { data: recentActivity = [] } = useGetRecentActivity({ query: { queryKey: getGetRecentActivityQueryKey() } });
   const { data: tanodPerf = [] } = useGetTanodPerformance({ query: { queryKey: getGetTanodPerformanceQueryKey() } });
 
-  const s = stats as any;
-  const activeAlerts = s?.activeAlerts ?? 0;
+  const activeAlerts = stats?.activeAlerts ?? 0;
   const isFlashing = activeAlerts > 0;
 
   return (
@@ -114,12 +128,12 @@ export default function AdminDashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-        <StatCard label="Total Alerts" value={s?.totalAlerts ?? 0} icon={AlertTriangle} color="#FF3B5C" border="border-[#FF3B5C]/20" pulse={activeAlerts > 0} />
+        <StatCard label="Total Alerts" value={stats?.totalAlerts ?? 0} icon={AlertTriangle} color="#FF3B5C" border="border-[#FF3B5C]/20" pulse={activeAlerts > 0} />
         <StatCard label="Active Alerts" value={activeAlerts} icon={Clock} color="#F59E0B" border="border-[#F59E0B]/20" pulse={activeAlerts > 0} />
-        <StatCard label="Resolved Today" value={s?.resolvedToday ?? 0} icon={CheckCircle} color="#10B981" border="border-[#10B981]/20" />
-        <StatCard label="Active Tanods" value={s?.activeTanods ?? 0} icon={Shield} color="#00AEEF" border="border-[#00AEEF]/20" />
-        <StatCard label="Pending Users" value={s?.pendingUsers ?? 0} icon={UserCheck} color="#F59E0B" border="border-[#F59E0B]/20" pulse={s?.pendingUsers > 0} />
-        <StatCard label="Total Residents" value={s?.totalResidents ?? 0} icon={Users} color="#00F0FF" border="border-[#00F0FF]/20" />
+        <StatCard label="Resolved Today" value={stats?.resolvedToday ?? 0} icon={CheckCircle} color="#10B981" border="border-[#10B981]/20" />
+        <StatCard label="Active Tanods" value={stats?.activeTanods ?? 0} icon={Shield} color="#00AEEF" border="border-[#00AEEF]/20" />
+        <StatCard label="Pending Users" value={stats?.pendingUsers ?? 0} icon={UserCheck} color="#F59E0B" border="border-[#F59E0B]/20" pulse={(stats?.pendingUsers ?? 0) > 0} />
+        <StatCard label="Total Residents" value={stats?.totalResidents ?? 0} icon={Users} color="#00F0FF" border="border-[#00F0FF]/20" />
       </div>
 
       {/* Charts + Activity */}
@@ -138,7 +152,7 @@ export default function AdminDashboard() {
               </div>
             ) : (
               <ResponsiveContainer width="100%" height={180}>
-                <BarChart data={Array.isArray(alertsByType) ? alertsByType : []} margin={{ top: 0, right: 0, bottom: 0, left: -20 }}>
+                <RechartsBarChart data={Array.isArray(alertsByType) ? alertsByType : []} margin={{ top: 0, right: 0, bottom: 0, left: -20 }}>
                   <XAxis dataKey="type" tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 10, fontFamily: "Rajdhani" }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 10, fontFamily: "Rajdhani" }} axisLine={false} tickLine={false} />
                   <Tooltip
@@ -151,7 +165,7 @@ export default function AdminDashboard() {
                       <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
                     ))}
                   </Bar>
-                </BarChart>
+                </RechartsBarChart>
               </ResponsiveContainer>
             )}
           </motion.div>
@@ -195,7 +209,7 @@ export default function AdminDashboard() {
             </h2>
           </div>
           <span className="text-[10px] font-mono font-bold text-white/30 tracking-wider uppercase bg-white/5 px-3 py-1 rounded-full border border-white/5 animate-pulse">
-            CONNECTED: {activeAlerts + (s?.activeTanods ?? 0)}
+            CONNECTED: {activeAlerts + (stats?.activeTanods ?? 0)}
           </span>
         </div>
 
