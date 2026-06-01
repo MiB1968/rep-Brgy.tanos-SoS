@@ -11,3 +11,9 @@ export {
   handleWebSocketDisconnect,
   type WebSocketContext,
 } from './handlers';
+export {
+  getAlertManager,
+  destroyAlertManager,
+  type AlertNotification,
+  type AlertSubscriber,
+} from './alert-manager';
