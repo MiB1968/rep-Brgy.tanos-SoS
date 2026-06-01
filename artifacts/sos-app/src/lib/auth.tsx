@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { setOnUnauthorized } from "@workspace/api-client-react";
 
 export interface AuthUser {
   id: string;
@@ -28,22 +29,16 @@ const AuthContext = createContext<AuthState | undefined>(undefined);
 // ---------------------------------------------------------------------------
 function isTokenExpired(token: string): boolean {
   try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
+    // Decode base64url to base64 before atob
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const payload = JSON.parse(atob(base64));
     if (typeof payload.exp !== "number") return false;
     // exp is in seconds; Date.now() is in ms
     return payload.exp * 1000 < Date.now();
   } catch {
     return true; // malformed token → treat as expired
   }
-}
-
-// ---------------------------------------------------------------------------
-// FIX: Expose a module-level logout so custom-fetch.ts can call it when the
-// server returns 401 (token revoked / user deleted / tokenVersion changed).
-// ---------------------------------------------------------------------------
-let _globalLogout: (() => void) | null = null;
-export function triggerGlobalLogout() {
-  _globalLogout?.();
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -80,11 +75,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   };
 
-  // Register with the module-level reference so custom-fetch can trigger it
+  // Register with the API client's unauthorized handler
   useEffect(() => {
-    _globalLogout = logout;
-    return () => { _globalLogout = null; };
-  });
+    setOnUnauthorized(logout);
+    return () => { setOnUnauthorized(null); };
+  }, []);
 
   const login = (newUser: AuthUser, newToken: string) => {
     localStorage.setItem("brgy_token", newToken);

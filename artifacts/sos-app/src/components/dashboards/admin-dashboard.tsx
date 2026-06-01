@@ -5,8 +5,10 @@ import {
   useGetAlertsByType, getGetAlertsByTypeQueryKey,
   useGetRecentActivity, getGetRecentActivityQueryKey,
   useGetTanodPerformance, getGetTanodPerformanceQueryKey,
+  AlertTypeCount, ActivityItem, TanodPerformance
 } from "@workspace/api-client-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { LucideIcon } from "lucide-react";
 import {
   AlertTriangle, Users, Shield, CheckCircle, Clock, UserCheck,
   Map as MapIcon, Activity, Calendar, Radio, FileText, PhoneCall,
@@ -28,7 +30,17 @@ const itemVariants = {
   show: { opacity: 1, y: 0 },
 };
 
-function StatCard({ label, value, icon: Icon, color, border, onClick, pulse }: any) {
+interface StatCardProps {
+  label: string;
+  value: string | number;
+  icon: LucideIcon;
+  color: string;
+  border: string;
+  onClick?: () => void;
+  pulse?: boolean;
+}
+
+function StatCard({ label, value, icon: Icon, color, border, onClick, pulse }: StatCardProps) {
   return (
     <motion.div
       variants={itemVariants}
@@ -57,8 +69,7 @@ export default function AdminDashboard() {
   const { data: recentActivity = [] } = useGetRecentActivity({ query: { queryKey: getGetRecentActivityQueryKey() } });
   const { data: tanodPerf = [] } = useGetTanodPerformance({ query: { queryKey: getGetTanodPerformanceQueryKey() } });
 
-  const s = stats as any;
-  const activeAlerts = s?.activeAlerts ?? 0;
+  const activeAlerts = stats?.activeAlerts ?? 0;
   const isFlashing = activeAlerts > 0;
 
   return (
@@ -114,12 +125,12 @@ export default function AdminDashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-        <StatCard label="Total Alerts" value={s?.totalAlerts ?? 0} icon={AlertTriangle} color="#FF3B5C" border="border-[#FF3B5C]/20" pulse={activeAlerts > 0} />
+        <StatCard label="Total Alerts" value={stats?.totalAlerts ?? 0} icon={AlertTriangle} color="#FF3B5C" border="border-[#FF3B5C]/20" pulse={activeAlerts > 0} />
         <StatCard label="Active Alerts" value={activeAlerts} icon={Clock} color="#F59E0B" border="border-[#F59E0B]/20" pulse={activeAlerts > 0} />
-        <StatCard label="Resolved Today" value={s?.resolvedToday ?? 0} icon={CheckCircle} color="#10B981" border="border-[#10B981]/20" />
-        <StatCard label="Active Tanods" value={s?.activeTanods ?? 0} icon={Shield} color="#00AEEF" border="border-[#00AEEF]/20" />
-        <StatCard label="Pending Users" value={s?.pendingUsers ?? 0} icon={UserCheck} color="#F59E0B" border="border-[#F59E0B]/20" pulse={s?.pendingUsers > 0} />
-        <StatCard label="Total Residents" value={s?.totalResidents ?? 0} icon={Users} color="#00F0FF" border="border-[#00F0FF]/20" />
+        <StatCard label="Resolved Today" value={stats?.resolvedToday ?? 0} icon={CheckCircle} color="#10B981" border="border-[#10B981]/20" />
+        <StatCard label="Active Tanods" value={stats?.activeTanods ?? 0} icon={Shield} color="#00AEEF" border="border-[#00AEEF]/20" />
+        <StatCard label="Pending Users" value={stats?.pendingUsers ?? 0} icon={UserCheck} color="#F59E0B" border="border-[#F59E0B]/20" pulse={(stats?.pendingUsers ?? 0) > 0} />
+        <StatCard label="Total Residents" value={stats?.totalResidents ?? 0} icon={Users} color="#00F0FF" border="border-[#00F0FF]/20" />
       </div>
 
       {/* Charts + Activity */}
@@ -147,7 +158,7 @@ export default function AdminDashboard() {
                     itemStyle={{ color: "rgba(255,255,255,0.7)" }}
                   />
                   <Bar dataKey="count" radius={[6, 6, 0, 0]}>
-                    {Array.isArray(alertsByType) && alertsByType.map((_: any, i: number) => (
+                    {Array.isArray(alertsByType) && (alertsByType as AlertTypeCount[]).map((_, i: number) => (
                       <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
                     ))}
                   </Bar>
@@ -168,7 +179,7 @@ export default function AdminDashboard() {
               {Array.isArray(recentActivity) && recentActivity.length === 0 ? (
                 <p className="text-sm text-white/30 text-center py-4">No activity yet</p>
               ) : (
-                Array.isArray(recentActivity) && recentActivity.slice(0, 10).map((item: any) => (
+                Array.isArray(recentActivity) && (recentActivity as ActivityItem[]).slice(0, 10).map((item) => (
                   <div key={item.id} className="flex items-start gap-2 py-1.5 border-b border-white/5 last:border-0">
                     <div className={cn("w-1.5 h-1.5 rounded-full mt-2 flex-shrink-0", item.category === "alert" ? "bg-[#FF3B5C]" : "bg-[#00AEEF]")} />
                     <div className="flex-1 min-w-0">
@@ -195,7 +206,7 @@ export default function AdminDashboard() {
             </h2>
           </div>
           <span className="text-[10px] font-mono font-bold text-white/30 tracking-wider uppercase bg-white/5 px-3 py-1 rounded-full border border-white/5 animate-pulse">
-            CONNECTED: {activeAlerts + (s?.activeTanods ?? 0)}
+            CONNECTED: {activeAlerts + (stats?.activeTanods ?? 0)}
           </span>
         </div>
 
@@ -239,7 +250,7 @@ export default function AdminDashboard() {
           {Array.isArray(tanodPerf) && tanodPerf.length === 0 ? (
             <p className="text-sm text-white/30 text-center py-4">No tanod data yet</p>
           ) : (
-            Array.isArray(tanodPerf) && tanodPerf.map((t: any) => (
+            Array.isArray(tanodPerf) && (tanodPerf as TanodPerformance[]).map((t) => (
               <div key={t.tanodId} className="flex items-center gap-3 py-2 border-b border-white/5 last:border-0">
                 <div className="w-8 h-8 rounded-full bg-[#00F0FF]/10 border border-[#00F0FF]/20 flex items-center justify-center text-xs font-bold text-[#00F0FF]">
                   {t.tanodName?.[0] ?? "T"}
