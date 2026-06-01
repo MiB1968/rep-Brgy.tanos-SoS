@@ -1,6 +1,6 @@
 import { Layout } from "@/components/layout";
 import { useAuth } from "@/lib/auth";
-import { useUpdateUser } from "@workspace/api-client-react";
+import { useUpdateUser, UserUpdate } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -43,7 +43,7 @@ export default function SettingsPage() {
 
   function onSubmit(data: FormData) {
     if (!user?.id) return;
-    updateUser.mutate({ id: user.id, data } as any, {
+    updateUser.mutate({ id: user.id, data: data as UserUpdate }, {
       onSuccess: (updated: any) => {
         toast({ title: "Profile updated" });
         login({ ...user, ...updated }, token!);

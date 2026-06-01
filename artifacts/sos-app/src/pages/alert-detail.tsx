@@ -8,6 +8,8 @@ import {
   useRespondToAlert,
   useResolveAlert,
   useCancelAlert,
+  AlertMessageInput,
+  ResolveAlertInput,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
@@ -53,21 +55,21 @@ export default function AlertDetailPage() {
 
   function handleSend() {
     if (!message.trim()) return;
-    sendMsg.mutate({ id, data: { message } } as any, {
+    sendMsg.mutate({ id, data: { message } as AlertMessageInput }, {
       onSuccess: () => { setMessage(""); invalidate(); },
     });
   }
 
   function handleRespond() {
-    respondMutation.mutate({ id } as any, { onSuccess: () => { toast({ title: "Responding to alert" }); invalidate(); } });
+    respondMutation.mutate({ id }, { onSuccess: () => { toast({ title: "Responding to alert" }); invalidate(); } });
   }
 
   function handleResolve() {
-    resolveMutation.mutate({ id, data: {} } as any, { onSuccess: () => { toast({ title: "Alert resolved" }); invalidate(); } });
+    resolveMutation.mutate({ id, data: {} as ResolveAlertInput }, { onSuccess: () => { toast({ title: "Alert resolved" }); invalidate(); } });
   }
 
   function handleCancel() {
-    cancelMutation.mutate({ id } as any, { onSuccess: () => { toast({ title: "Alert cancelled" }); invalidate(); } });
+    cancelMutation.mutate({ id }, { onSuccess: () => { toast({ title: "Alert cancelled" }); invalidate(); } });
   }
 
   if (isLoading) return (

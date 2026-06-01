@@ -4,6 +4,8 @@ import {
   useListBroadcasts, getListBroadcastsQueryKey,
   useCreateBroadcast,
   useUpdateBroadcast,
+  BroadcastInput,
+  BroadcastUpdate,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
@@ -41,8 +43,8 @@ export default function BroadcastsPage() {
   const [open, setOpen] = useState(false);
 
   const { data: broadcasts = [], isLoading } = useListBroadcasts(
-    {},
-    { query: { queryKey: getListBroadcastsQueryKey({}) } }
+    undefined,
+    { query: { queryKey: getListBroadcastsQueryKey(undefined) } }
   );
 
   const createBroadcast = useCreateBroadcast();
@@ -54,7 +56,7 @@ export default function BroadcastsPage() {
   });
 
   function onSubmit(data: FormData) {
-    createBroadcast.mutate({ data } as any, {
+    createBroadcast.mutate({ data: data as BroadcastInput }, {
       onSuccess: () => {
         toast({ title: "Broadcast sent" });
         setOpen(false);
@@ -66,7 +68,7 @@ export default function BroadcastsPage() {
   }
 
   function toggleActive(id: string, isActive: boolean) {
-    updateBroadcast.mutate({ id, data: { isActive: !isActive } } as any, {
+    updateBroadcast.mutate({ id, data: { isActive: !isActive } as BroadcastUpdate }, {
       onSuccess: () => qc.invalidateQueries({ queryKey: getListBroadcastsQueryKey({}) }),
     });
   }

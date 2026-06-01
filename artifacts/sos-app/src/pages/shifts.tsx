@@ -5,6 +5,8 @@ import {
   useCreateShift,
   useRespondToShift,
   useListUsers, getListUsersQueryKey,
+  ShiftInput,
+  ShiftResponseInput,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
@@ -68,7 +70,7 @@ export default function ShiftsPage() {
     const tanodName = Array.isArray(tanods)
       ? (tanods as any[]).find(t => t.id === data.tanodId)?.name ?? ""
       : "";
-    createShift.mutate({ data: { ...data, tanodName } } as any, {
+    createShift.mutate({ data: { ...data, tanodName } as ShiftInput }, {
       onSuccess: () => {
         toast({ title: "Shift created" });
         setOpen(false);
@@ -80,7 +82,7 @@ export default function ShiftsPage() {
   }
 
   function respond(id: string, response: string) {
-    respondToShift.mutate({ id, data: { response } } as any, {
+    respondToShift.mutate({ id, data: { response } as ShiftResponseInput }, {
       onSuccess: () => {
         toast({ title: `Shift ${response}` });
         qc.invalidateQueries({ queryKey: getListShiftsQueryKey({}) });

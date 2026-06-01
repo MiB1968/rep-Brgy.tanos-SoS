@@ -10,7 +10,7 @@ import {
   useListShifts, getListShiftsQueryKey,
   useGetMyPatrol, getGetMyPatrolQueryKey,
   useUpdateMyPatrol,
-  Alert, Shift, PatrolUpdate
+  Alert, Shift, PatrolUpdate,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
@@ -68,7 +68,7 @@ export default function TanodDashboard() {
   function toggleDuty() {
     const newStatus = !isOnDuty;
     updatePatrol.mutate(
-      { data: { isActive: newStatus, status: newStatus ? "patrolling" : "offline" } },
+      { data: { isActive: newStatus, status: newStatus ? "patrolling" : "offline" } as PatrolUpdate },
       {
         onSuccess: () => {
           toast({ title: newStatus ? "🟢 Now On Duty" : "⚫ Off Duty", description: newStatus ? "You are visible to admin dispatch" : "Patrol status updated" });

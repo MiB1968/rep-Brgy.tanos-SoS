@@ -3,6 +3,7 @@ import { Layout } from "@/components/layout";
 import {
   useListIncidents, getListIncidentsQueryKey,
   useCreateIncident,
+  IncidentInput,
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/auth";
@@ -42,8 +43,8 @@ export default function IncidentsPage() {
   const [open, setOpen] = useState(false);
 
   const { data: incidents = [], isLoading } = useListIncidents(
-    {},
-    { query: { queryKey: getListIncidentsQueryKey({}) } }
+    undefined,
+    { query: { queryKey: getListIncidentsQueryKey(undefined) } }
   );
 
   const createIncident = useCreateIncident();
@@ -54,7 +55,7 @@ export default function IncidentsPage() {
   });
 
   function onSubmit(data: FormData) {
-    createIncident.mutate({ data } as any, {
+    createIncident.mutate({ data: data as IncidentInput }, {
       onSuccess: () => {
         toast({ title: "Incident reported" });
         setOpen(false);
