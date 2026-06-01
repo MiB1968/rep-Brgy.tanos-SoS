@@ -1,0 +1,1 @@
+- [Brgy Tanod SOS setup](brgy-tanod-sos.md) — JWT auth in localStorage, custom-fetch auto-attaches token, Tailwind v4 cannot @apply dark variant

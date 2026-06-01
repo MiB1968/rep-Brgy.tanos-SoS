@@ -1,0 +1,1286 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: Brgy.Tanod S.O.S Emergency Response API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: auth
+    description: Authentication operations
+  - name: alerts
+    description: SOS alert operations
+  - name: users
+    description: User management
+  - name: patrols
+    description: Tanod patrol operations
+  - name: incidents
+    description: Incident report operations
+  - name: broadcasts
+    description: System broadcast operations
+  - name: messages
+    description: Alert chat messages
+  - name: shifts
+    description: Patrol shift scheduling
+  - name: logs
+    description: Activity logs
+  - name: stats
+    description: Dashboard statistics
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterInput"
+      responses:
+        "201":
+          description: User registered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Validation error
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Unauthorized
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user profile
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Unauthorized
+
+  /users:
+    get:
+      operationId: listUsers
+      tags: [users]
+      summary: List users (admin only)
+      parameters:
+        - name: role
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Users list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+
+  /users/{id}:
+    get:
+      operationId: getUser
+      tags: [users]
+      summary: Get user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: Not found
+
+    patch:
+      operationId: updateUser
+      tags: [users]
+      summary: Update user (admin/self)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdate"
+      responses:
+        "200":
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/{id}/approve:
+    post:
+      operationId: approveUser
+      tags: [users]
+      summary: Approve pending user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User approved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /users/{id}/reject:
+    post:
+      operationId: rejectUser
+      tags: [users]
+      summary: Reject pending user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RejectInput"
+      responses:
+        "200":
+          description: User rejected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  /alerts:
+    get:
+      operationId: listAlerts
+      tags: [alerts]
+      summary: List alerts
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: residentId
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Alerts list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Alert"
+
+    post:
+      operationId: createAlert
+      tags: [alerts]
+      summary: Create SOS alert
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AlertInput"
+      responses:
+        "201":
+          description: Alert created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Alert"
+
+  /alerts/{id}:
+    get:
+      operationId: getAlert
+      tags: [alerts]
+      summary: Get alert by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Alert
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Alert"
+        "404":
+          description: Not found
+
+    patch:
+      operationId: updateAlert
+      tags: [alerts]
+      summary: Update alert status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AlertUpdate"
+      responses:
+        "200":
+          description: Updated alert
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Alert"
+
+  /alerts/{id}/respond:
+    post:
+      operationId: respondToAlert
+      tags: [alerts]
+      summary: Tanod responds to alert
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Alert updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Alert"
+
+  /alerts/{id}/resolve:
+    post:
+      operationId: resolveAlert
+      tags: [alerts]
+      summary: Resolve alert
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResolveAlertInput"
+      responses:
+        "200":
+          description: Alert resolved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Alert"
+
+  /alerts/{id}/cancel:
+    post:
+      operationId: cancelAlert
+      tags: [alerts]
+      summary: Cancel alert
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Alert cancelled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Alert"
+
+  /alerts/{id}/messages:
+    get:
+      operationId: listAlertMessages
+      tags: [messages]
+      summary: Get chat messages for alert
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AlertMessage"
+
+    post:
+      operationId: createAlertMessage
+      tags: [messages]
+      summary: Send message in alert chat
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AlertMessageInput"
+      responses:
+        "201":
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AlertMessage"
+
+  /patrols:
+    get:
+      operationId: listPatrols
+      tags: [patrols]
+      summary: List active tanod patrols
+      responses:
+        "200":
+          description: Active patrols
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Patrol"
+
+  /patrols/me:
+    get:
+      operationId: getMyPatrol
+      tags: [patrols]
+      summary: Get current tanod's patrol status
+      responses:
+        "200":
+          description: Patrol status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Patrol"
+
+    patch:
+      operationId: updateMyPatrol
+      tags: [patrols]
+      summary: Update tanod patrol status/location
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatrolUpdate"
+      responses:
+        "200":
+          description: Updated patrol
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Patrol"
+
+  /incidents:
+    get:
+      operationId: listIncidents
+      tags: [incidents]
+      summary: List incident reports
+      parameters:
+        - name: tanodId
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Incidents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Incident"
+
+    post:
+      operationId: createIncident
+      tags: [incidents]
+      summary: File an incident report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IncidentInput"
+      responses:
+        "201":
+          description: Incident created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Incident"
+
+  /incidents/{id}:
+    get:
+      operationId: getIncident
+      tags: [incidents]
+      summary: Get incident by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Incident
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Incident"
+    patch:
+      operationId: updateIncident
+      tags: [incidents]
+      summary: Update incident report
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IncidentUpdate"
+      responses:
+        "200":
+          description: Updated incident
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Incident"
+
+  /broadcasts:
+    get:
+      operationId: listBroadcasts
+      tags: [broadcasts]
+      summary: List system broadcasts
+      parameters:
+        - name: isActive
+          in: query
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Broadcasts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Broadcast"
+
+    post:
+      operationId: createBroadcast
+      tags: [broadcasts]
+      summary: Create system broadcast (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BroadcastInput"
+      responses:
+        "201":
+          description: Broadcast created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Broadcast"
+
+  /broadcasts/{id}:
+    patch:
+      operationId: updateBroadcast
+      tags: [broadcasts]
+      summary: Update broadcast
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BroadcastUpdate"
+      responses:
+        "200":
+          description: Updated broadcast
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Broadcast"
+
+  /shifts:
+    get:
+      operationId: listShifts
+      tags: [shifts]
+      summary: List patrol shifts
+      parameters:
+        - name: tanodId
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Shifts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Shift"
+
+    post:
+      operationId: createShift
+      tags: [shifts]
+      summary: Schedule a patrol shift (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ShiftInput"
+      responses:
+        "201":
+          description: Shift created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shift"
+
+  /shifts/{id}/respond:
+    post:
+      operationId: respondToShift
+      tags: [shifts]
+      summary: Tanod accepts or rejects shift
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ShiftResponseInput"
+      responses:
+        "200":
+          description: Shift updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Shift"
+
+  /logs/tanod:
+    get:
+      operationId: listTanodActivityLogs
+      tags: [logs]
+      summary: List tanod activity logs
+      parameters:
+        - name: tanodId
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Activity logs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TanodActivityLog"
+
+    post:
+      operationId: createTanodActivityLog
+      tags: [logs]
+      summary: Log tanod activity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TanodActivityLogInput"
+      responses:
+        "201":
+          description: Log created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TanodActivityLog"
+
+  /stats/dashboard:
+    get:
+      operationId: getDashboardStats
+      tags: [stats]
+      summary: Get admin dashboard statistics
+      responses:
+        "200":
+          description: Dashboard statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+  /stats/alerts-by-type:
+    get:
+      operationId: getAlertsByType
+      tags: [stats]
+      summary: Get alert counts grouped by type
+      responses:
+        "200":
+          description: Alerts by type
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AlertTypeCount"
+
+  /stats/recent-activity:
+    get:
+      operationId: getRecentActivity
+      tags: [stats]
+      summary: Get recent system activity feed
+      responses:
+        "200":
+          description: Recent activity
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityItem"
+
+  /stats/tanod-performance:
+    get:
+      operationId: getTanodPerformance
+      tags: [stats]
+      summary: Get tanod response performance metrics
+      responses:
+        "200":
+          description: Tanod performance metrics
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TanodPerformance"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    RegisterInput:
+      type: object
+      required: [name, email, password, role]
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 6
+        role:
+          type: string
+          enum: [resident, tanod]
+        phone:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+
+    LoginInput:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    AuthResponse:
+      type: object
+      required: [token, user]
+      properties:
+        token:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+
+    User:
+      type: object
+      required: [id, name, email, role, status, createdAt]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [resident, tanod, admin, superadmin]
+        status:
+          type: string
+          enum: [pending, approved, rejected, active]
+        phone:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        barangayId:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+        lastActive:
+          type: ["string", "null"]
+          format: date-time
+
+    UserUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        phone:
+          type: ["string", "null"]
+        address:
+          type: ["string", "null"]
+        status:
+          type: ["string", "null"]
+        role:
+          type: ["string", "null"]
+
+    RejectInput:
+      type: object
+      properties:
+        reason:
+          type: string
+
+    Location:
+      type: object
+      required: [lat, lng]
+      properties:
+        lat:
+          type: number
+        lng:
+          type: number
+        accuracy:
+          type: ["number", "null"]
+
+    Alert:
+      type: object
+      required: [id, type, status, location, createdAt]
+      properties:
+        id:
+          type: string
+        residentId:
+          type: ["string", "null"]
+        residentName:
+          type: ["string", "null"]
+        type:
+          type: string
+          enum: [MEDICAL, FIRE, CRIME, NATURAL_DISASTER, VIOLENCE, FLOOD, DISTURBANCE, OTHER]
+        status:
+          type: string
+          enum: [pending, responding, resolved, cancelled]
+        location:
+          $ref: "#/components/schemas/Location"
+        description:
+          type: ["string", "null"]
+        severityScore:
+          type: ["integer", "null"]
+        assignedTo:
+          type: ["string", "null"]
+        assignedToName:
+          type: ["string", "null"]
+        respondedBy:
+          type: ["string", "null"]
+        respondedByName:
+          type: ["string", "null"]
+        respondedAt:
+          type: ["string", "null"]
+          format: date-time
+        resolvedAt:
+          type: ["string", "null"]
+          format: date-time
+        resolutionNotes:
+          type: ["string", "null"]
+        responderNotes:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    AlertInput:
+      type: object
+      required: [type, location]
+      properties:
+        type:
+          type: string
+          enum: [MEDICAL, FIRE, CRIME, NATURAL_DISASTER, VIOLENCE, FLOOD, DISTURBANCE, OTHER]
+        location:
+          $ref: "#/components/schemas/Location"
+        description:
+          type: ["string", "null"]
+
+    AlertUpdate:
+      type: object
+      properties:
+        status:
+          type: ["string", "null"]
+        assignedTo:
+          type: ["string", "null"]
+        assignedToName:
+          type: ["string", "null"]
+        resolutionNotes:
+          type: ["string", "null"]
+        responderNotes:
+          type: ["string", "null"]
+        severityScore:
+          type: ["integer", "null"]
+
+    ResolveAlertInput:
+      type: object
+      properties:
+        resolutionNotes:
+          type: ["string", "null"]
+
+    AlertMessage:
+      type: object
+      required: [id, alertId, senderId, senderName, senderRole, message, timestamp]
+      properties:
+        id:
+          type: string
+        alertId:
+          type: string
+        senderId:
+          type: string
+        senderName:
+          type: string
+        senderRole:
+          type: string
+        message:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    AlertMessageInput:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+
+    Patrol:
+      type: object
+      required: [tanodId, isActive]
+      properties:
+        tanodId:
+          type: string
+        tanodName:
+          type: ["string", "null"]
+        isActive:
+          type: boolean
+        location:
+          oneOf:
+            - $ref: "#/components/schemas/Location"
+            - type: "null"
+        status:
+          type: ["string", "null"]
+          enum: [patrolling, responding, offline, null]
+        lastPing:
+          type: ["string", "null"]
+          format: date-time
+
+    PatrolUpdate:
+      type: object
+      properties:
+        isActive:
+          type: ["boolean", "null"]
+        location:
+          oneOf:
+            - $ref: "#/components/schemas/Location"
+            - type: "null"
+        status:
+          type: ["string", "null"]
+
+    Incident:
+      type: object
+      required: [id, tanodId, tanodName, type, status, timestamp]
+      properties:
+        id:
+          type: string
+        alertId:
+          type: ["string", "null"]
+        tanodId:
+          type: string
+        tanodName:
+          type: string
+        type:
+          type: string
+        status:
+          type: string
+          enum: [pending, ongoing, resolved, referred]
+        location:
+          type: ["string", "null"]
+        gpsLocation:
+          oneOf:
+            - $ref: "#/components/schemas/Location"
+            - type: "null"
+        description:
+          type: string
+        personsInvolved:
+          type: ["string", "null"]
+        actionsTaken:
+          type: ["string", "null"]
+        citizenName:
+          type: ["string", "null"]
+        timestamp:
+          type: string
+          format: date-time
+        resolvedAt:
+          type: ["string", "null"]
+          format: date-time
+        resolutionNotes:
+          type: ["string", "null"]
+
+    IncidentInput:
+      type: object
+      required: [type, description]
+      properties:
+        alertId:
+          type: ["string", "null"]
+        type:
+          type: string
+        status:
+          type: string
+        location:
+          type: ["string", "null"]
+        gpsLocation:
+          oneOf:
+            - $ref: "#/components/schemas/Location"
+            - type: "null"
+        description:
+          type: string
+        personsInvolved:
+          type: ["string", "null"]
+        actionsTaken:
+          type: ["string", "null"]
+        citizenName:
+          type: ["string", "null"]
+
+    IncidentUpdate:
+      type: object
+      properties:
+        status:
+          type: ["string", "null"]
+        actionsTaken:
+          type: ["string", "null"]
+        resolutionNotes:
+          type: ["string", "null"]
+
+    Broadcast:
+      type: object
+      required: [id, message, timestamp, isActive]
+      properties:
+        id:
+          type: string
+        incidentId:
+          type: ["string", "null"]
+        adminId:
+          type: ["string", "null"]
+        adminName:
+          type: ["string", "null"]
+        type:
+          type: ["string", "null"]
+          enum: [evacuation, calamity, security, emergency, other, null]
+        message:
+          type: string
+        isActive:
+          type: boolean
+        approvalStatus:
+          type: ["string", "null"]
+        timestamp:
+          type: string
+          format: date-time
+
+    BroadcastInput:
+      type: object
+      required: [message, type]
+      properties:
+        message:
+          type: string
+        type:
+          type: string
+          enum: [evacuation, calamity, security, emergency, other]
+        incidentId:
+          type: ["string", "null"]
+
+    BroadcastUpdate:
+      type: object
+      properties:
+        isActive:
+          type: ["boolean", "null"]
+        approvalStatus:
+          type: ["string", "null"]
+
+    Shift:
+      type: object
+      required: [id, tanodId, tanodName, startTime, endTime, sector, status]
+      properties:
+        id:
+          type: string
+        tanodId:
+          type: string
+        tanodName:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        sector:
+          type: string
+        status:
+          type: string
+          enum: [scheduled, active, completed]
+        tanodResponse:
+          type: ["string", "null"]
+          enum: [pending, accepted, rejected, null]
+        notes:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+
+    ShiftInput:
+      type: object
+      required: [tanodId, tanodName, startTime, endTime, sector]
+      properties:
+        tanodId:
+          type: string
+        tanodName:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        sector:
+          type: string
+        notes:
+          type: ["string", "null"]
+
+    ShiftResponseInput:
+      type: object
+      required: [response]
+      properties:
+        response:
+          type: string
+          enum: [accepted, rejected]
+
+    TanodActivityLog:
+      type: object
+      required: [id, tanodId, tanodName, type, timestamp, details]
+      properties:
+        id:
+          type: string
+        tanodId:
+          type: string
+        tanodName:
+          type: string
+        type:
+          type: string
+          enum: [duty_start, duty_end, alert_response, patrol_marker, status_change]
+        timestamp:
+          type: string
+          format: date-time
+        details:
+          type: string
+        location:
+          oneOf:
+            - $ref: "#/components/schemas/Location"
+            - type: "null"
+
+    TanodActivityLogInput:
+      type: object
+      required: [type, details]
+      properties:
+        type:
+          type: string
+          enum: [duty_start, duty_end, alert_response, patrol_marker, status_change]
+        details:
+          type: string
+        location:
+          oneOf:
+            - $ref: "#/components/schemas/Location"
+            - type: "null"
+
+    DashboardStats:
+      type: object
+      required: [totalAlerts, activeAlerts, resolvedToday, activeTanods, pendingUsers, totalResidents]
+      properties:
+        totalAlerts:
+          type: integer
+        activeAlerts:
+          type: integer
+        resolvedToday:
+          type: integer
+        activeTanods:
+          type: integer
+        pendingUsers:
+          type: integer
+        totalResidents:
+          type: integer
+        avgResponseTimeMinutes:
+          type: ["number", "null"]
+
+    AlertTypeCount:
+      type: object
+      required: [type, count]
+      properties:
+        type:
+          type: string
+        count:
+          type: integer
+
+    ActivityItem:
+      type: object
+      required: [id, description, timestamp, category]
+      properties:
+        id:
+          type: string
+        description:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        category:
+          type: string
+
+    TanodPerformance:
+      type: object
+      required: [tanodId, tanodName, alertsResponded, avgResponseTimeMinutes]
+      properties:
+        tanodId:
+          type: string
+        tanodName:
+          type: string
+        alertsResponded:
+          type: integer
+        avgResponseTimeMinutes:
+          type: number
